@@ -27,7 +27,10 @@ client/src/
 │   ├── AppRoutes.tsx         Nơi đăng ký route tập trung
 │   └── paths.ts              Hằng số URL
 ├── styles/
-│   └── app.css               Global, admin và storefront được chia theo section/prefix
+│   ├── app.css               File điều phối, chỉ import các stylesheet khác
+│   ├── base.css              Reset và style dùng chung
+│   ├── admin.css             Đăng nhập và giao diện quản trị
+│   └── storefront.css        Layout và các trang khách hàng
 ├── App.tsx
 └── main.tsx
 ```
@@ -40,7 +43,9 @@ client/src/
 - Component thực sự dùng chung mới đặt trong `components/common`.
 - Hàm gọi API phải nằm trong `api`, không gọi Axios trực tiếp trong page/component.
 - Route mới phải khai báo tại `paths.ts` và đăng ký tại `AppRoutes.tsx`.
-- CSS storefront dùng prefix `store-`/`home-`; CSS admin dùng prefix `admin-`.
+- CSS storefront đặt trong `storefront.css` và dùng prefix `store-`/`home-`.
+- CSS admin đặt trong `admin.css` và ưu tiên prefix `admin-`.
+- CSS dùng chung mới được đặt trong `base.css`; không thêm rule trực tiếp vào `app.css`.
 
 ## Backend
 
@@ -89,4 +94,3 @@ Không bắt buộc tạo mọi file nếu module rất nhỏ, nhưng không đ�
 
 Các file dùng chung như `AppRoutes.tsx`, `paths.ts`, `app.css`, `server/src/app.ts` và các file
 `package.json` cần được trao đổi trước khi nhiều thành viên cùng sửa.
-

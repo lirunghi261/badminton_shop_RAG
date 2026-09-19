@@ -100,6 +100,7 @@ Main text:     #0f2740
 
 Quy tắc tránh ảnh hưởng admin:
 
+- CSS storefront đặt tại `client/src/styles/storefront.css`.
 - Class storefront dùng prefix `store-` hoặc `home-`.
 - Class admin dùng prefix `admin-`; không ghi đè các class này.
 - Không style trực tiếp selector chung như `button`, `.ant-btn`, `.ant-card` nếu không giới hạn scope.

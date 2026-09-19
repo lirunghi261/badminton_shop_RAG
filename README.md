@@ -100,6 +100,9 @@ tránh ảnh hưởng route, CSS, xác thực và phần quản trị.
 Toàn bộ thành viên nên đọc [`docs/project-structure.md`](docs/project-structure.md) để thống nhất vị
 trí page, component, API và backend module.
 
+CSS được chia tại `client/src/styles/`: `base.css` cho style dùng chung, `admin.css` cho trang quản
+trị và `storefront.css` cho trang khách hàng. `app.css` chỉ có nhiệm vụ import các file này.
+
 ## Scripts
 
 ```bash
