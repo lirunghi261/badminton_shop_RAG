@@ -19,7 +19,7 @@ Sprint nền tảng trang quản trị gồm:
 - Soạn mô tả sản phẩm dạng rich text với định dạng chữ, liên kết, bảng và ảnh chèn từ máy; HTML được lọc an toàn ở backend.
 - Script tạo hoặc cập nhật tài khoản admin.
 - Menu khung cho sản phẩm, danh mục, thương hiệu, đơn hàng và khách hàng.
-- Storefront công khai với Home page cơ bản và route tách biệt khỏi trang quản trị.
+- Storefront công khai có trang danh sách/tìm kiếm/lọc sản phẩm và trang chi tiết sản phẩm, tách biệt khỏi trang quản trị.
 
 ## Cấu trúc
 
@@ -81,10 +81,10 @@ npm run dev
 
 ```text
 /                    Trang chủ công khai
-/products            Danh sách sản phẩm (khung chờ phát triển)
-/products/:slug      Chi tiết sản phẩm (khung chờ phát triển)
+/products            Danh sách, tìm kiếm, lọc và sắp xếp sản phẩm đang bán
+/products/:slug      Chi tiết sản phẩm đang bán
 /ai-advisor          Trợ lý tư vấn AI (khung chờ phát triển)
-/cart                Giỏ hàng (khung chờ phát triển)
+/cart                Giỏ hàng phía trình duyệt, lưu số lượng và tạm tính
 /account             Tài khoản khách hàng (khung chờ phát triển)
 
 /admin/login         Đăng nhập quản trị
@@ -112,6 +112,19 @@ không nhầm danh mục với thương hiệu và không lưu tồn kho ở sai
 
 CSS được chia tại `client/src/styles/`: `base.css` cho style dùng chung, `admin.css` cho trang quản
 trị và `storefront.css` cho trang khách hàng. `app.css` chỉ có nhiệm vụ import các file này.
+
+## API sản phẩm công khai
+
+Không cần đăng nhập để gọi các endpoint dưới đây. Chúng chỉ trả về sản phẩm, danh mục và thương hiệu
+đang ở trạng thái `active`; sản phẩm nháp hoặc ngừng bán không bị lộ.
+
+```text
+GET /api/products
+GET /api/products/:slug
+```
+
+Endpoint danh sách nhận `page`, `limit`, `search`, `category`, `brand` và `sort`. Giá trị `sort` hợp
+lệ là `newest`, `price-asc` và `price-desc`; `category`/`brand` dùng slug hoặc `all`.
 
 ## API quản lý người dùng
 
