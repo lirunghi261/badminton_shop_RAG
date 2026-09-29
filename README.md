@@ -160,3 +160,5 @@ npm run seed:catalog # Upsert danh mục và thương hiệu cầu lông mẫu
 - Không tạo admin thông qua API đăng ký công khai.
 - Đổi mật khẩu seed sau khi thiết lập.
 - Production phải chạy HTTPS để cookie có thuộc tính `secure`.
+
+<!-- RAG branch test: TaDangAnhDuong_24TX810068 -->
