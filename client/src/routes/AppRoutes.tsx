@@ -14,6 +14,9 @@ const ProductDetailPage = lazy(() =>
   import("../pages/storefront/ProductDetailPage").then((module) => ({ default: module.ProductDetailPage })),
 );
 const CartPage = lazy(() => import("../pages/storefront/CartPage").then((module) => ({ default: module.CartPage })));
+const AiAdvisorPreviewPage = lazy(() =>
+  import("../pages/storefront/AiAdvisorPreviewPage").then((module) => ({ default: module.AiAdvisorPreviewPage })),
+);
 const StorefrontPlaceholderPage = lazy(() =>
   import("../pages/storefront/StorefrontPlaceholderPage").then((module) => ({ default: module.StorefrontPlaceholderPage })),
 );
@@ -44,7 +47,7 @@ export function AppRoutes() {
           <Route index element={<HomePage />} />
           <Route path="products" element={<ProductListPage />} />
           <Route path="products/:slug" element={<ProductDetailPage />} />
-          <Route path="ai-advisor" element={<StorefrontPlaceholderPage />} />
+          <Route path="ai-advisor" element={<AiAdvisorPreviewPage />} />
           <Route path="cart" element={<CartPage />} />
           <Route path="account" element={<StorefrontPlaceholderPage />} />
         </Route>
