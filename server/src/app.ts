@@ -10,6 +10,7 @@ import { categoriesRouter } from "./modules/categories/categories.routes.js";
 import { dashboardRouter } from "./modules/dashboard/dashboard.routes.js";
 import { productsRouter } from "./modules/products/products.routes.js";
 import { publicProductsRouter } from "./modules/products/public-products.routes.js";
+import { ragRouter } from "./modules/rag/rag.routes.js";
 import { catalogImagesRouter, uploadsRouter } from "./modules/uploads/uploads.routes.js";
 import { usersRouter } from "./modules/users/users.routes.js";
 
@@ -32,6 +33,7 @@ app.get("/api/health", (_request, response) => {
 
 app.use("/api/auth", authRouter);
 app.use("/api/products", publicProductsRouter);
+app.use("/api/rag", ragRouter);
 app.use("/api/admin/dashboard", dashboardRouter);
 app.use("/api/admin/users", usersRouter);
 app.use("/api/admin/categories", categoriesRouter);

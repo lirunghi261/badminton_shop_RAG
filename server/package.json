@@ -10,7 +10,8 @@
     "lint": "tsc -p tsconfig.json --noEmit",
     "seed:admin": "tsx src/scripts/seedAdmin.ts",
     "seed:catalog": "tsx src/scripts/seedCatalog.ts",
-    "migrate:catalog-images": "tsx src/scripts/migrateCatalogImagesToGridFS.ts"
+    "migrate:catalog-images": "tsx src/scripts/migrateCatalogImagesToGridFS.ts",
+    "rag:preview": "tsx src/scripts/previewRagData.ts"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
