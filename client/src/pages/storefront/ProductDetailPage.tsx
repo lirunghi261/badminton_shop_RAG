@@ -1,10 +1,14 @@
-import { ArrowLeftOutlined, CheckCircleFilled, PictureOutlined, ShoppingOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined, CheckCircleFilled, PictureOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Alert, App, Button, Card, Col, Result, Row, Skeleton, Tag } from "antd";
+import { App, Button, Card, Col, Result, Row, Skeleton, Tag } from "antd";
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getStorefrontProduct, type StorefrontProduct } from "../../api/storefront/products.api";
-import { formatCurrency, getPrimaryImage, getVariantPricing } from "../../components/storefront/productPresentation";
+import { ProductRichText } from "../../components/storefront/ProductRichText";
+import { RelatedProducts } from "../../components/storefront/RelatedProducts";
+import { ProductAvailabilityPanel } from "../../components/storefront/ProductAvailabilityPanel";
+import { ProductOfferPanel } from "../../components/storefront/ProductOfferPanel";
+import { formatCurrency, getPrimaryImage, getVariantName, getVariantPricing } from "../../components/storefront/productPresentation";
 import { paths } from "../../routes/paths";
 import { useCart } from "../../cart/useCart";
 
@@ -17,6 +21,7 @@ function ProductDetailLoading() {
 function ProductDetailContent({ product }: { product: StorefrontProduct }) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSku, setSelectedSku] = useState<string | undefined>();
+  const [quantity, setQuantity] = useState(1);
   const [imageFailed, setImageFailed] = useState(false);
   const { addProduct } = useCart();
   const { message } = App.useApp();
@@ -27,18 +32,20 @@ function ProductDetailContent({ product }: { product: StorefrontProduct }) {
   const pricing = getVariantPricing(product, selectedVariant);
 
   const isInStock = (selectedVariant?.stock ?? product.totalStock) > 0;
+  const selectedStock = Math.max(0, Math.floor(selectedVariant?.stock ?? product.totalStock));
   const addToCart = () => {
     if (!selectedVariant) return;
-    addProduct(product, selectedVariant);
-    message.success("Đã thêm sản phẩm vào giỏ hàng.");
+    addProduct(product, selectedVariant, quantity);
+    message.success(`Đã thêm ${quantity} sản phẩm vào giỏ hàng.`);
   };
+  const changeQuantity = (nextQuantity: number) => setQuantity(Math.min(Math.max(1, Number.isFinite(nextQuantity) ? Math.floor(nextQuantity) : 1), selectedStock || 1));
 
   return (
     <section className="store-product-detail">
       <div className="store-container">
         <Link className="store-back-link" to={paths.products}><ArrowLeftOutlined /> Tất cả sản phẩm</Link>
-        <Row gutter={[46, 32]}>
-          <Col xs={24} lg={12}>
+        <Row gutter={[38, 32]}>
+          <Col xs={24} lg={8}>
             <div className="store-product-gallery">
               <div className="store-product-main-image">
                 {activeImage && !imageFailed ? (
@@ -62,10 +69,11 @@ function ProductDetailContent({ product }: { product: StorefrontProduct }) {
               )}
             </div>
           </Col>
-          <Col xs={24} lg={12}>
+          <Col xs={24} lg={10}>
             <div className="store-product-info">
               <div className="store-product-breadcrumb"><span>{product.category.name}</span><span> / </span><span>{product.brand.name}</span></div>
               <h1>{product.name}</h1>
+              <div className="store-product-meta"><span>Mã sản phẩm: <strong>{selectedVariant?.sku ?? "Đang cập nhật"}</strong></span><i /><span>Thương hiệu: <strong>{product.brand.name}</strong></span></div>
               <p className="store-product-short-description">{product.shortDescription}</p>
               <div className="store-product-detail-price">
                 <strong>{formatCurrency(pricing.salePrice ?? pricing.regularPrice)}</strong>
@@ -84,37 +92,27 @@ function ProductDetailContent({ product }: { product: StorefrontProduct }) {
                         type="button"
                         key={variant.sku}
                         disabled={variant.stock === 0}
-                        onClick={() => setSelectedSku(variant.sku)}
+                        onClick={() => { setSelectedSku(variant.sku); setQuantity(1); }}
                         className={selectedVariant?.sku === variant.sku ? "active" : ""}
                       >
                         {variant.colorHex && <i style={{ backgroundColor: variant.colorHex }} />}
-                        {variant.colorName}
+                        {getVariantName(variant)}
                       </button>
                     ))}
                   </div>
                 </div>
               )}
 
-              <Alert
-                className="store-cart-notice"
-                type="info"
-                showIcon
-                message="Đặt hàng sẽ được mở ở bước tiếp theo"
-                description="Bạn có thể thêm sản phẩm vào giỏ và điều chỉnh số lượng trước khi đặt hàng."
-              />
-              <Button type="primary" size="large" icon={<ShoppingOutlined />} disabled={!isInStock} onClick={addToCart} block>
-                {isInStock ? "Thêm vào giỏ hàng" : "Tạm hết hàng"}
-              </Button>
+              {isInStock && <ProductOfferPanel quantity={quantity} stock={selectedStock} onQuantityChange={changeQuantity} onAddToCart={addToCart} />}
             </div>
           </Col>
+          <Col xs={24} lg={6}><ProductAvailabilityPanel stock={selectedStock} variantName={selectedVariant ? getVariantName(selectedVariant) : "Đang cập nhật"} /></Col>
         </Row>
 
         <Row gutter={[24, 24]} className="store-product-detail-sections">
           <Col xs={24} lg={product.specifications.length ? 14 : 24}>
             <Card title="Mô tả sản phẩm" className="store-detail-card">
-              {product.description ? (
-                <div className="store-rich-description" dangerouslySetInnerHTML={{ __html: product.description }} />
-              ) : <p>{product.shortDescription || "Thông tin chi tiết sẽ được cập nhật sớm."}</p>}
+              <ProductRichText html={product.description} fallback={product.shortDescription} />
             </Card>
           </Col>
           {product.specifications.length > 0 && (
@@ -132,6 +130,7 @@ function ProductDetailContent({ product }: { product: StorefrontProduct }) {
             </Col>
           )}
         </Row>
+        <RelatedProducts product={product} />
       </div>
     </section>
   );

@@ -20,7 +20,7 @@ export interface CartContextValue {
   items: CartItem[];
   itemCount: number;
   subtotal: number;
-  addProduct: (product: StorefrontProduct, variant?: StorefrontProductVariant) => void;
+  addProduct: (product: StorefrontProduct, variant?: StorefrontProductVariant, quantity?: number) => void;
   updateQuantity: (key: string, quantity: number) => void;
   removeItem: (key: string) => void;
   clearCart: () => void;

@@ -1,0 +1,23 @@
+import { CheckCircleFilled, InfoCircleOutlined } from "@ant-design/icons";
+import { Alert, Col, Row, Steps } from "antd";
+import { useState } from "react";
+import { Navigate } from "react-router-dom";
+import { useCart } from "../../cart/useCart";
+import { CheckoutCustomerForm, type CheckoutFormValues } from "../../components/storefront/CheckoutCustomerForm";
+import { CheckoutOrderSummary } from "../../components/storefront/CheckoutOrderSummary";
+import { CheckoutReview } from "../../components/storefront/CheckoutReview";
+import { paths } from "../../routes/paths";
+
+export function CheckoutPage() {
+  const { items, itemCount, subtotal } = useCart();
+  const [checkoutValues, setCheckoutValues] = useState<CheckoutFormValues | null>(null);
+  const [isReviewing, setIsReviewing] = useState(false);
+  if (!items.length) return <Navigate to={paths.cart} replace />;
+  return <section className="store-checkout-page"><div className="store-container">
+    <header className="store-checkout-heading"><span className="eyebrow">Thanh toán</span><h1>Hoàn tất thông tin đặt hàng</h1><p>Kiểm tra thông tin nhận hàng và đơn hàng trước khi xác nhận.</p></header>
+    <Steps className="store-checkout-steps" current={isReviewing ? 1 : 0} items={[{ title: "Thông tin giao nhận" }, { title: "Xác nhận" }, { title: "Tạo đơn" }]} />
+    {isReviewing && checkoutValues && <Alert className="store-checkout-contract-notice" type="info" showIcon icon={<InfoCircleOutlined />} message="Thông tin giao nhận đã hợp lệ" description={`Cảm ơn ${checkoutValues.fullName}. Bước tạo đơn và thanh toán sẽ được kích hoạt khi API đơn hàng được thống nhất.`} />}
+    <Row gutter={[28, 28]} align="top"><Col xs={24} lg={15}>{isReviewing && checkoutValues ? <CheckoutReview values={checkoutValues} onEdit={() => setIsReviewing(false)} /> : <CheckoutCustomerForm initialValues={checkoutValues ?? undefined} onFinish={(values) => { setCheckoutValues(values); setIsReviewing(true); }} />}</Col><Col xs={24} lg={9}><CheckoutOrderSummary items={items} itemCount={itemCount} subtotal={subtotal} /></Col></Row>
+    <div className="store-checkout-security"><CheckCircleFilled /> Thông tin này chỉ được dùng trong phiên checkout hiện tại và không lưu access token ở trình duyệt.</div>
+  </div></section>;
+}

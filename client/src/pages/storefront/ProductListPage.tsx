@@ -2,9 +2,11 @@ import { FilterOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icon
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Alert, Button, Card, Col, Empty, Input, Pagination, Row, Select, Skeleton, Space } from "antd";
 import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import heroEquipment from "../../assets/storefront-hero-equipment-ocean.png";
 import { getStorefrontProducts, type StorefrontProductListParams } from "../../api/storefront/products.api";
 import { ProductCard } from "../../components/storefront/ProductCard";
+import { paths } from "../../routes/paths";
 
 const pageSize = 12;
 
@@ -67,15 +69,31 @@ export function ProductListPage() {
 
   const applySearch = (value: string) => updateParams({ q: value.trim(), page: "1" });
   const filters = productsQuery.data?.filters;
+  const activeCategoryName = filters?.categories.find((item) => item.slug === category)?.name;
 
   return (
     <section className="store-catalog">
       <div className="store-container">
-        <header className="store-catalog-heading">
-          <span className="eyebrow">Bộ sưu tập</span>
-          <h1>Tìm đúng dụng cụ cho trận đấu của bạn.</h1>
-          <p>Khám phá các sản phẩm đang có sẵn, chọn theo thương hiệu, danh mục và khoảng giá phù hợp.</p>
+        <header className="store-catalog-hero">
+          <img src={heroEquipment} alt="" />
+          <span className="store-catalog-hero-shade" />
+          <div className="store-catalog-hero-content">
+            <span className="eyebrow">Bộ sưu tập cầu lông</span>
+            <h1>{activeCategoryName ? activeCategoryName : "Tìm đúng dụng cụ cho trận đấu của bạn."}</h1>
+            <p>Khám phá sản phẩm đang có sẵn, so sánh biến thể và chọn trang bị phù hợp với lối chơi của bạn.</p>
+            <div className="store-catalog-quick-links">
+              <Link className={category === "all" ? "active" : ""} to={paths.products}>Tất cả sản phẩm</Link>
+              {filters?.categories.slice(0, 5).map((item) => <Link className={category === item.slug ? "active" : ""} key={item.slug} to={paths.productsByCategory(item.slug)}>{item.name}</Link>)}
+            </div>
+          </div>
+          <div className="store-catalog-hero-stat"><strong>{productsQuery.data?.pagination.total ?? "…"}</strong><span>sản phẩm<br />trong catalog</span></div>
         </header>
+
+        <div className="store-catalog-highlights" aria-label="Lợi ích mua sắm">
+          <span><strong>Chọn đúng hơn</strong> Lọc theo danh mục, thương hiệu và giá</span>
+          <span><strong>Tồn kho rõ ràng</strong> Kiểm tra biến thể trước khi thêm giỏ</span>
+          <span><strong>Tư vấn nhanh</strong> Nhận gợi ý từ trợ lý sản phẩm</span>
+        </div>
 
         <Card className="store-filter-card">
           <div className="store-filter-main">

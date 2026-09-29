@@ -20,6 +20,12 @@ export interface StorefrontProductSpecification {
   unit: string;
 }
 
+export interface StorefrontProductVariantAttribute {
+  key: string;
+  label: string;
+  value: string | number | boolean;
+}
+
 export interface StorefrontProductVariant {
   _id?: string;
   sku: string;
@@ -29,6 +35,7 @@ export interface StorefrontProductVariant {
   salePrice?: number | null;
   stock: number;
   imageUrl?: string;
+  attributes?: StorefrontProductVariantAttribute[];
 }
 
 export interface StorefrontProduct {

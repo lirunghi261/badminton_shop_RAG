@@ -14,11 +14,14 @@ const ProductDetailPage = lazy(() =>
   import("../pages/storefront/ProductDetailPage").then((module) => ({ default: module.ProductDetailPage })),
 );
 const CartPage = lazy(() => import("../pages/storefront/CartPage").then((module) => ({ default: module.CartPage })));
-const AiAdvisorPreviewPage = lazy(() =>
-  import("../pages/storefront/AiAdvisorPreviewPage").then((module) => ({ default: module.AiAdvisorPreviewPage })),
+const AiAdvisorPage = lazy(() =>
+  import("../pages/storefront/AiAdvisorPage").then((module) => ({ default: module.AiAdvisorPage })),
 );
-const StorefrontPlaceholderPage = lazy(() =>
-  import("../pages/storefront/StorefrontPlaceholderPage").then((module) => ({ default: module.StorefrontPlaceholderPage })),
+const AccountPage = lazy(() =>
+  import("../pages/storefront/AccountPage").then((module) => ({ default: module.AccountPage })),
+);
+const CheckoutPage = lazy(() =>
+  import("../pages/storefront/CheckoutPage").then((module) => ({ default: module.CheckoutPage })),
 );
 const AdminLoginPage = lazy(() => import("../pages/admin/LoginPage").then((module) => ({ default: module.LoginPage })));
 const DashboardPage = lazy(() => import("../pages/admin/DashboardPage").then((module) => ({ default: module.DashboardPage })));
@@ -47,9 +50,10 @@ export function AppRoutes() {
           <Route index element={<HomePage />} />
           <Route path="products" element={<ProductListPage />} />
           <Route path="products/:slug" element={<ProductDetailPage />} />
-          <Route path="ai-advisor" element={<AiAdvisorPreviewPage />} />
+          <Route path="ai-advisor" element={<AiAdvisorPage />} />
           <Route path="cart" element={<CartPage />} />
-          <Route path="account" element={<StorefrontPlaceholderPage />} />
+          <Route path="checkout" element={<CheckoutPage />} />
+          <Route path="account" element={<AccountPage />} />
         </Route>
 
         <Route path={paths.admin.login} element={<AdminLoginPage />} />
