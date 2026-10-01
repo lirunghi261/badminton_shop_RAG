@@ -2,6 +2,7 @@ export const paths = {
   home: "/",
   products: "/products",
   productsByCategory: (category: string) => `/products?category=${encodeURIComponent(category)}`,
+  productsByBrand: (brand: string) => `/products?brand=${encodeURIComponent(brand)}`,
   productDetail: (slug: string) => `/products/${slug}`,
   aiAdvisor: "/ai-advisor",
   cart: "/cart",

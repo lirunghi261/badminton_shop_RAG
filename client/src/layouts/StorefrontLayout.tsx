@@ -18,8 +18,6 @@ const navigation = [
   { label: "Trang chủ", to: paths.home },
   { label: "Sản phẩm", to: paths.products },
   { label: "Tư vấn AI", to: paths.aiAdvisor, icon: <RobotOutlined /> },
-  { label: "Giỏ hàng", to: paths.cart },
-  { label: "Tài khoản", to: paths.account },
 ];
 
 export function StorefrontLayout() {

@@ -27,7 +27,7 @@ export function ProductCard({ product }: ProductCardProps) {
       <Card className="store-product-card" hoverable>
         <div className="store-product-image">
           {image && !imageFailed ? (
-            <img src={image.url} alt={image.alt || product.name} onError={() => setImageFailed(true)} />
+            <img src={image.url} alt={image.alt || product.name} loading="lazy" decoding="async" onError={() => setImageFailed(true)} />
           ) : (
             <span className="store-product-image-fallback"><PictureOutlined /> Chưa có ảnh</span>
           )}
@@ -36,8 +36,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
         <div className="store-product-content">
           <span className="store-product-category">{product.category.name}</span>
-          <h2>{product.name}</h2>
-          <p>{product.shortDescription || "Sản phẩm cầu lông chính hãng, sẵn sàng cho mọi trận đấu."}</p>
+          <h3>{product.name}</h3>
           <div className="store-product-bottom">
             <div className="store-product-price">
               <strong>{formatCurrency(startingPrice)}</strong>

@@ -1,6 +1,6 @@
-import { FilterOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
+import { ReloadOutlined, SearchOutlined } from "@ant-design/icons";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { Alert, Button, Card, Col, Empty, Input, Pagination, Row, Select, Skeleton, Space } from "antd";
+import { Alert, Button, Card, Empty, Input, Pagination, Select, Skeleton, Space } from "antd";
 import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import heroEquipment from "../../assets/storefront-hero-equipment-ocean.png";
@@ -8,7 +8,7 @@ import { getStorefrontProducts, type StorefrontProductListParams } from "../../a
 import { ProductCard } from "../../components/storefront/ProductCard";
 import { paths } from "../../routes/paths";
 
-const pageSize = 12;
+const pageSize = 15;
 
 function positiveInteger(value: string | null, fallback: number) {
   const parsed = Number(value);
@@ -86,7 +86,6 @@ export function ProductListPage() {
               {filters?.categories.slice(0, 5).map((item) => <Link className={category === item.slug ? "active" : ""} key={item.slug} to={paths.productsByCategory(item.slug)}>{item.name}</Link>)}
             </div>
           </div>
-          <div className="store-catalog-hero-stat"><strong>{productsQuery.data?.pagination.total ?? "…"}</strong><span>sản phẩm<br />trong catalog</span></div>
         </header>
 
         <div className="store-catalog-highlights" aria-label="Lợi ích mua sắm">
@@ -121,14 +120,13 @@ export function ProductListPage() {
               ]}
             />
           </div>
-          <div className="store-filter-meta">
-            <span><FilterOutlined /> {productsQuery.data ? `${productsQuery.data.pagination.total} sản phẩm` : "Đang tải sản phẩm"}</span>
-            {(search || category !== "all" || brand !== "all" || params.sort !== "newest") && (
+          {(search || category !== "all" || brand !== "all" || params.sort !== "newest") && (
+            <div className="store-filter-meta">
               <Button type="link" icon={<ReloadOutlined />} onClick={() => setSearchParams({})}>
                 Xóa bộ lọc
               </Button>
-            )}
-          </div>
+            </div>
+          )}
         </Card>
 
         {productsQuery.isError && (
@@ -143,18 +141,18 @@ export function ProductListPage() {
         )}
 
         {productsQuery.isPending ? (
-          <Row gutter={[20, 20]}>
+          <div className="store-product-grid">
             {Array.from({ length: 8 }, (_, index) => (
-              <Col xs={24} sm={12} lg={8} xl={6} key={index}><Card className="store-product-skeleton"><Skeleton active paragraph={{ rows: 3 }} /></Card></Col>
+              <Card className="store-product-skeleton" key={index}><Skeleton active paragraph={{ rows: 3 }} /></Card>
             ))}
-          </Row>
+          </div>
         ) : productsQuery.data && productsQuery.data.products.length > 0 ? (
           <>
-            <Row gutter={[20, 20]}>
+            <div className="store-product-grid">
               {productsQuery.data.products.map((product) => (
-                <Col xs={24} sm={12} lg={8} xl={6} key={product.id}><ProductCard product={product} /></Col>
+                <ProductCard product={product} key={product.id} />
               ))}
-            </Row>
+            </div>
             {productsQuery.data.pagination.totalPages > 1 && (
               <div className="store-pagination">
                 <Pagination

@@ -4,11 +4,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import heroDoubles from "../../assets/storefront-hero-doubles-ocean.png";
 import heroEquipment from "../../assets/storefront-hero-equipment-ocean.png";
-import heroFlatlay from "../../assets/storefront-hero-flatlay-sunrise.png";
-import heroFutureCourt from "../../assets/storefront-hero-future-court.png";
-import heroNeonSmash from "../../assets/storefront-hero-neon-smash.png";
 import heroSmash from "../../assets/storefront-hero-smash-ocean.png";
-import heroTournament from "../../assets/storefront-hero-tournament.png";
 import { paths } from "../../routes/paths";
 
 const slides = [
@@ -36,38 +32,6 @@ const slides = [
     action: "Tư vấn cùng AI",
     to: paths.aiAdvisor,
   },
-  {
-    image: heroNeonSmash,
-    eyebrow: "Dòng vợt hiệu năng",
-    title: "Bật tốc từng pha cầu.",
-    description: "Cảm nhận nhịp độ mạnh mẽ với bộ trang bị phù hợp cho những pha tấn công quyết đoán.",
-    action: "Khám phá vợt",
-    to: paths.products,
-  },
-  {
-    image: heroFutureCourt,
-    eyebrow: "Sân đấu tương lai",
-    title: "Chinh phục nhịp độ mới.",
-    description: "Kết hợp độ linh hoạt và kiểm soát để giữ sự chủ động trong từng tình huống trên sân.",
-    action: "Chọn trang bị",
-    to: paths.products,
-  },
-  {
-    image: heroFlatlay,
-    eyebrow: "Combo sẵn sàng",
-    title: "Trang bị đồng bộ, chơi trọn vẹn.",
-    description: "Hoàn thiện túi đồ tập với những món thiết yếu, từ giày, quấn cán đến ống cầu bền bỉ.",
-    action: "Xem phụ kiện",
-    to: paths.products,
-  },
-  {
-    image: heroTournament,
-    eyebrow: "Đêm thi đấu",
-    title: "Tự tin tạo dấu ấn.",
-    description: "Sẵn sàng bước vào trận đấu với lựa chọn được tinh chỉnh theo mục tiêu và phong cách của bạn.",
-    action: "Tìm sản phẩm phù hợp",
-    to: paths.products,
-  },
 ];
 
 export function HomeHeroCarousel() {
@@ -85,15 +49,16 @@ export function HomeHeroCarousel() {
 
   return (
     <section className="home-hero-carousel" aria-roledescription="carousel" aria-label="Banner nổi bật">
-      {slides.map((slide, index) => (
-        <img
-          key={slide.image}
-          className={index === activeSlide ? "home-hero-image active" : "home-hero-image"}
-          src={slide.image}
-          alt=""
-          aria-hidden={index !== activeSlide}
-        />
-      ))}
+      <img
+        key={current.image}
+        className="home-hero-image active"
+        src={current.image}
+        alt=""
+        loading={activeSlide === 0 ? "eager" : "lazy"}
+        fetchPriority={activeSlide === 0 ? "high" : "low"}
+        decoding="async"
+        aria-hidden="true"
+      />
       <div className="home-hero-shade" />
       <div className="store-container home-hero-content">
         <p className="home-hero-eyebrow">{current.eyebrow}</p>
