@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import type { StorefrontProduct, StorefrontProductVariant } from "../api/storefront/products.api";
 import { getPrimaryImage, getVariantName, getVariantPricing } from "../components/storefront/productPresentation";
-import { CartContext, type CartContextValue, type CartItem } from "./cartContext";
+import { CartContext, type CartAddResult, type CartContextValue, type CartItem } from "./cartContext";
 
 const storageKey = "badminton-shop-cart";
 
@@ -35,11 +35,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<CartContextValue>(() => {
     const addProduct = (product: StorefrontProduct, variant?: StorefrontProductVariant, quantity = 1) => {
-      const selectedVariant = variant ?? product.variants[0];
+      const selectedVariant = variant ?? product.variants.find((candidate) => candidate.stock > 0) ?? product.variants[0];
       const stock = selectedVariant ? Math.floor(selectedVariant.stock) : 0;
-      if (!selectedVariant || stock < 1) return;
+      if (!selectedVariant || stock < 1) return null;
       const requestedQuantity = Number.isFinite(quantity) ? Math.min(Math.max(1, Math.floor(quantity)), stock) : 1;
       const key = `${product.id}:${selectedVariant.sku}`;
+      const existingQuantity = items.find((currentItem) => currentItem.key === key)?.quantity ?? 0;
+      const addedQuantity = Math.min(requestedQuantity, Math.max(0, stock - existingQuantity));
       const primaryImage = getPrimaryImage(product.images);
       const { regularPrice, salePrice } = getVariantPricing(product, selectedVariant);
       const item: CartItem = {
@@ -65,6 +67,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
           : currentItem,
         );
       });
+      const result: CartAddResult = { addedQuantity, totalQuantity: Math.min(stock, existingQuantity + addedQuantity) };
+      return result;
     };
 
     const updateQuantity = (key: string, quantity: number) => {

@@ -2,7 +2,7 @@ import { ArrowLeftOutlined, CheckCircleFilled, PictureOutlined } from "@ant-desi
 import { useQuery } from "@tanstack/react-query";
 import { App, Button, Card, Col, Result, Row, Skeleton, Tag } from "antd";
 import { useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { getStorefrontProduct, type StorefrontProduct } from "../../api/storefront/products.api";
 import { ProductRichText } from "../../components/storefront/ProductRichText";
 import { RelatedProducts } from "../../components/storefront/RelatedProducts";
@@ -25,18 +25,32 @@ function ProductDetailContent({ product }: { product: StorefrontProduct }) {
   const [imageFailed, setImageFailed] = useState(false);
   const { addProduct } = useCart();
   const { message } = App.useApp();
+  const navigate = useNavigate();
 
   const images = useMemo(() => [...product.images].sort((first, second) => first.sortOrder - second.sortOrder), [product.images]);
   const activeImage = images[selectedImage] ?? getPrimaryImage(product.images);
-  const selectedVariant = product.variants.find((variant) => variant.sku === selectedSku) ?? product.variants[0];
+  const selectedVariant = product.variants.find((variant) => variant.sku === selectedSku)
+    ?? product.variants.find((variant) => variant.stock > 0)
+    ?? product.variants[0];
   const pricing = getVariantPricing(product, selectedVariant);
 
   const isInStock = (selectedVariant?.stock ?? product.totalStock) > 0;
   const selectedStock = Math.max(0, Math.floor(selectedVariant?.stock ?? product.totalStock));
   const addToCart = () => {
     if (!selectedVariant) return;
-    addProduct(product, selectedVariant, quantity);
-    message.success(`Đã thêm ${quantity} sản phẩm vào giỏ hàng.`);
+    const result = addProduct(product, selectedVariant, quantity);
+    if (!result) {
+      message.error("Phiên bản này hiện không còn hàng. Hãy chọn một phiên bản khác.");
+      return;
+    }
+    if (result.addedQuantity === 0) {
+      message.warning("Bạn đã thêm tối đa số lượng còn trong kho vào giỏ hàng.");
+      return;
+    }
+    message.success({
+      content: <span>Đã thêm {result.addedQuantity} sản phẩm. <button className="store-message-cart-link" type="button" onClick={() => { message.destroy(); navigate(paths.cart); }}>Xem giỏ hàng</button></span>,
+      duration: 4,
+    });
   };
   const changeQuantity = (nextQuantity: number) => setQuantity(Math.min(Math.max(1, Number.isFinite(nextQuantity) ? Math.floor(nextQuantity) : 1), selectedStock || 1));
 
@@ -61,6 +75,7 @@ function ProductDetailContent({ product }: { product: StorefrontProduct }) {
                       key={`${image.url}-${index}`}
                       onClick={() => { setSelectedImage(index); setImageFailed(false); }}
                       aria-label={`Xem ảnh ${index + 1} của ${product.name}`}
+                      aria-pressed={index === selectedImage}
                     >
                       <img src={image.url} alt="" />
                     </button>
@@ -91,12 +106,15 @@ function ProductDetailContent({ product }: { product: StorefrontProduct }) {
                       <button
                         type="button"
                         key={variant.sku}
-                        disabled={variant.stock === 0}
+                        disabled={variant.stock <= 0}
                         onClick={() => { setSelectedSku(variant.sku); setQuantity(1); }}
                         className={selectedVariant?.sku === variant.sku ? "active" : ""}
+                        aria-pressed={selectedVariant?.sku === variant.sku}
+                        aria-label={`${getVariantName(variant)} — ${variant.stock > 0 ? `còn ${variant.stock} sản phẩm` : "tạm hết hàng"}`}
                       >
                         {variant.colorHex && <i style={{ backgroundColor: variant.colorHex }} />}
-                        {getVariantName(variant)}
+                        <span>{getVariantName(variant)}</span>
+                        <small>{variant.stock > 0 ? `Còn ${variant.stock}` : "Hết hàng"}</small>
                       </button>
                     ))}
                   </div>

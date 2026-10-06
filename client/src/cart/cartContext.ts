@@ -16,11 +16,16 @@ export interface CartItem {
   stock: number;
 }
 
+export interface CartAddResult {
+  addedQuantity: number;
+  totalQuantity: number;
+}
+
 export interface CartContextValue {
   items: CartItem[];
   itemCount: number;
   subtotal: number;
-  addProduct: (product: StorefrontProduct, variant?: StorefrontProductVariant, quantity?: number) => void;
+  addProduct: (product: StorefrontProduct, variant?: StorefrontProductVariant, quantity?: number) => CartAddResult | null;
   updateQuantity: (key: string, quantity: number) => void;
   removeItem: (key: string) => void;
   clearCart: () => void;

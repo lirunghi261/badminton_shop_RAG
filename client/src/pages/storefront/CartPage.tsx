@@ -38,7 +38,7 @@ export function CartPage() {
                 <div className="store-cart-item-info">
                   <Link to={paths.productDetail(item.slug)}>{item.name}</Link>
                   <span>{item.variantName}{item.colorHex && <i style={{ backgroundColor: item.colorHex }} />}</span>
-                  <small>SKU: {item.variantSku}</small>
+                  <small>SKU: {item.variantSku} · {item.stock > 0 ? `Còn ${item.stock}` : "Tạm hết hàng"}</small>
                 </div>
                 <strong className="store-cart-item-price">{formatCurrency(item.price)}</strong>
                 <div className="store-quantity-control">
@@ -53,7 +53,7 @@ export function CartPage() {
               </Card>
             ))}
           </div>
-          <aside>
+          <aside className="store-cart-summary-shell">
             <Card className="store-cart-summary" title="Tóm tắt đơn hàng">
               <div><span>Tạm tính ({itemCount} sản phẩm)</span><strong>{formatCurrency(subtotal)}</strong></div>
               <div><span>Phí vận chuyển</span><span>Chọn ở bước đặt hàng</span></div>
@@ -62,6 +62,7 @@ export function CartPage() {
               <Link to={paths.checkout}><Button type="primary" size="large" block>Tiến hành đặt hàng</Button></Link>
               <Link to={paths.products} className="store-cart-continue">← Tiếp tục mua sắm</Link>
             </Card>
+            <p className="store-cart-summary-note">Bạn vẫn có thể điều chỉnh số lượng hoặc xoá sản phẩm trước khi sang bước nhập thông tin nhận hàng.</p>
           </aside>
         </div>
       </div>

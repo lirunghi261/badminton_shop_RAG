@@ -96,29 +96,41 @@ export function ProductListPage() {
 
         <Card className="store-filter-card">
           <div className="store-filter-main">
-            <ProductSearch key={search} initialSearch={search} onSearch={applySearch} />
-            <Select
-              aria-label="Lọc theo danh mục"
-              value={category}
-              onChange={(value) => updateParams({ category: value, page: "1" })}
-              options={[{ label: "Tất cả danh mục", value: "all" }, ...(filters?.categories.map((item) => ({ label: item.name, value: item.slug })) ?? [])]}
-            />
-            <Select
-              aria-label="Lọc theo thương hiệu"
-              value={brand}
-              onChange={(value) => updateParams({ brand: value, page: "1" })}
-              options={[{ label: "Tất cả thương hiệu", value: "all" }, ...(filters?.brands.map((item) => ({ label: item.name, value: item.slug })) ?? [])]}
-            />
-            <Select
-              aria-label="Sắp xếp sản phẩm"
-              value={params.sort}
-              onChange={(value) => updateParams({ sort: value, page: "1" })}
-              options={[
-                { label: "Mới nhất", value: "newest" },
-                { label: "Giá thấp đến cao", value: "price-asc" },
-                { label: "Giá cao đến thấp", value: "price-desc" },
-              ]}
-            />
+            <label className="store-filter-field store-filter-search">
+              <span>Tìm sản phẩm</span>
+              <ProductSearch key={search} initialSearch={search} onSearch={applySearch} />
+            </label>
+            <label className="store-filter-field">
+              <span>Danh mục</span>
+              <Select
+                aria-label="Lọc theo danh mục"
+                value={category}
+                onChange={(value) => updateParams({ category: value, page: "1" })}
+                options={[{ label: "Tất cả danh mục", value: "all" }, ...(filters?.categories.map((item) => ({ label: item.name, value: item.slug })) ?? [])]}
+              />
+            </label>
+            <label className="store-filter-field">
+              <span>Thương hiệu</span>
+              <Select
+                aria-label="Lọc theo thương hiệu"
+                value={brand}
+                onChange={(value) => updateParams({ brand: value, page: "1" })}
+                options={[{ label: "Tất cả thương hiệu", value: "all" }, ...(filters?.brands.map((item) => ({ label: item.name, value: item.slug })) ?? [])]}
+              />
+            </label>
+            <label className="store-filter-field">
+              <span>Sắp xếp</span>
+              <Select
+                aria-label="Sắp xếp sản phẩm"
+                value={params.sort}
+                onChange={(value) => updateParams({ sort: value, page: "1" })}
+                options={[
+                  { label: "Mới nhất", value: "newest" },
+                  { label: "Giá thấp đến cao", value: "price-asc" },
+                  { label: "Giá cao đến thấp", value: "price-desc" },
+                ]}
+              />
+            </label>
           </div>
           <div className="store-filter-meta">
             <span aria-live="polite">

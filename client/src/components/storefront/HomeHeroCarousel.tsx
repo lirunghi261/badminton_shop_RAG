@@ -1,4 +1,4 @@
-import { ArrowRightOutlined, LeftOutlined, RightOutlined, RobotOutlined, ShoppingOutlined } from "@ant-design/icons";
+import { ArrowRightOutlined, CaretRightOutlined, LeftOutlined, PauseOutlined, RightOutlined, RobotOutlined, ShoppingOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -72,12 +72,13 @@ const slides = [
 
 export function HomeHeroCarousel() {
   const [activeSlide, setActiveSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+    if (isPaused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
     const interval = window.setInterval(() => setActiveSlide((current) => (current + 1) % slides.length), 6500);
     return () => window.clearInterval(interval);
-  }, []);
+  }, [isPaused]);
 
   const current = slides[activeSlide];
   const previous = () => setActiveSlide((currentSlide) => (currentSlide + slides.length - 1) % slides.length);
@@ -108,6 +109,15 @@ export function HomeHeroCarousel() {
       </div>
       <button className="home-hero-arrow home-hero-arrow-left" type="button" onClick={previous} aria-label="Banner trước"><LeftOutlined /></button>
       <button className="home-hero-arrow home-hero-arrow-right" type="button" onClick={next} aria-label="Banner tiếp theo"><RightOutlined /></button>
+      <button
+        className="home-hero-pause"
+        type="button"
+        aria-pressed={isPaused}
+        aria-label={isPaused ? "Tiếp tục tự chuyển banner" : "Tạm dừng tự chuyển banner"}
+        onClick={() => setIsPaused((paused) => !paused)}
+      >
+        {isPaused ? <CaretRightOutlined /> : <PauseOutlined />}
+      </button>
       <div className="home-hero-dots" role="tablist" aria-label="Chọn banner">
         {slides.map((slide, index) => (
           <button
