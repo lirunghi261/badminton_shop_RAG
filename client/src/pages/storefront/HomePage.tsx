@@ -3,7 +3,8 @@ import { Col, Row } from "antd";
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import heroDoubles from "../../assets/storefront-hero-doubles-ocean.png";
-import heroEquipment from "../../assets/storefront-hero-equipment-ocean.png";
+import heroFlatlay from "../../assets/storefront-hero-flatlay-sunrise.png";
+import heroFutureCourt from "../../assets/storefront-hero-future-court.png";
 import heroSmash from "../../assets/storefront-hero-smash-ocean.png";
 import { SeoHead } from "../../components/common/SeoHead";
 import { HomeFeaturedProducts } from "../../components/storefront/HomeFeaturedProducts";
@@ -12,9 +13,9 @@ import { paths } from "../../routes/paths";
 
 const categories = [
   { name: "Vợt cầu lông", description: "Kiểm soát, tốc độ và sức mạnh", symbol: "01", slug: "vot-cau-long", image: heroSmash },
-  { name: "Giày cầu lông", description: "Bám sân và bảo vệ từng bước chân", symbol: "02", slug: "giay-cau-long", image: heroEquipment },
+  { name: "Giày cầu lông", description: "Bám sân và bảo vệ từng bước chân", symbol: "02", slug: "giay-cau-long", image: heroFutureCourt },
   { name: "Áo cầu lông", description: "Thoải mái trong mọi trận đấu", symbol: "03", slug: "ao-cau-long", image: heroDoubles },
-  { name: "Phụ kiện cầu lông", description: "Hoàn thiện bộ trang bị của bạn", symbol: "04", slug: "phu-kien-cau-long", image: heroEquipment },
+  { name: "Phụ kiện cầu lông", description: "Hoàn thiện bộ trang bị của bạn", symbol: "04", slug: "phu-kien-cau-long", image: heroFlatlay },
 ];
 
 const shoppingGuides = [
@@ -95,10 +96,10 @@ export function HomePage() {
         <div className="store-container">
           <div className="section-heading"><div><span className="eyebrow">Danh mục nổi bật</span><h2>Sẵn sàng cho sân đấu</h2></div><Link to={paths.products}>Xem tất cả →</Link></div>
           <Row gutter={[18, 18]}>
-            {categories.map((category) => (
-              <Col xs={24} sm={12} lg={6} key={category.name}>
+            {categories.map((category, index) => (
+              <Col xs={24} sm={index === 0 ? 24 : 12} lg={index === 0 ? 12 : 4} key={category.name}>
                 <Link to={paths.productsByCategory(category.slug)} className="category-link">
-                  <article className="category-card"><img src={category.image} alt={`Khám phá ${category.name}`} loading="lazy" decoding="async" /><span className="category-shade" /><span className="category-number">{category.symbol}</span><div><h3>{category.name}</h3><p>{category.description}</p></div><span className="category-arrow">→</span></article>
+                  <article className={index === 0 ? "category-card category-card-featured" : "category-card"}><img src={category.image} alt={`Khám phá ${category.name}`} loading="lazy" decoding="async" /><span className="category-shade" /><span className="category-number">{category.symbol}</span><div><h3>{category.name}</h3><p>{category.description}</p></div><span className="category-arrow">Khám phá <span aria-hidden="true">→</span></span></article>
                 </Link>
               </Col>
             ))}

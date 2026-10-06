@@ -37,12 +37,13 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="store-product-content">
           <span className="store-product-category">{product.category.name}</span>
           <h3>{product.name}</h3>
+          {product.shortDescription && <p>{product.shortDescription}</p>}
           <div className="store-product-bottom">
             <div className="store-product-price">
               <strong>{formatCurrency(startingPrice)}</strong>
               {hasSale && <del>{formatCurrency(regularPrice)}</del>}
             </div>
-            <ArrowRightOutlined aria-hidden="true" />
+            <span className="store-product-detail-link">Xem chi tiết <ArrowRightOutlined aria-hidden="true" /></span>
           </div>
           <span className={product.totalStock > 0 ? "store-product-stock" : "store-product-stock unavailable"}><CheckCircleFilled /> {product.totalStock > 0 ? (lowStock ? "Sắp hết hàng" : "Còn hàng") : "Tạm hết hàng"}</span>
         </div>

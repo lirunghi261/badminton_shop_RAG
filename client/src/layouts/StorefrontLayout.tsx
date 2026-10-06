@@ -46,6 +46,7 @@ export function StorefrontLayout() {
 
   return (
     <div className="store-shell" id="store-top">
+      <a className="store-skip-link" href="#store-main">Đi đến nội dung chính</a>
       <header className="store-header">
         <div className="store-utility-bar"><div className="store-container"><span><PhoneOutlined /> Hotline: <strong>0977 508 430</strong></span><span><EnvironmentOutlined /> Hệ thống cửa hàng</span></div></div>
         <div className="store-container store-header-inner">
@@ -70,7 +71,7 @@ export function StorefrontLayout() {
         <div className="store-nav-bar"><div className="store-container desktop-nav">{navLinks}</div></div>
       </header>
 
-      <main>
+      <main id="store-main" tabIndex={-1}>
         <Outlet />
       </main>
 

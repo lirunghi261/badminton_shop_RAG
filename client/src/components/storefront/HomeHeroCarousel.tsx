@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import heroDoubles from "../../assets/storefront-hero-doubles-ocean.png";
 import heroEquipment from "../../assets/storefront-hero-equipment-ocean.png";
+import heroFlatlay from "../../assets/storefront-hero-flatlay-sunrise.png";
+import heroFutureCourt from "../../assets/storefront-hero-future-court.png";
+import heroNeonSmash from "../../assets/storefront-hero-neon-smash.png";
 import heroSmash from "../../assets/storefront-hero-smash-ocean.png";
+import heroTournament from "../../assets/storefront-hero-tournament.png";
 import { paths } from "../../routes/paths";
 
 const slides = [
@@ -30,6 +34,38 @@ const slides = [
     title: "Tìm dụng cụ hợp với bạn.",
     description: "Nói với trợ lý AI về trình độ, ngân sách và lối chơi để nhận gợi ý sản phẩm phù hợp.",
     action: "Tư vấn cùng AI",
+    to: paths.aiAdvisor,
+  },
+  {
+    image: heroNeonSmash,
+    eyebrow: "Vợt cho lối chơi tấn công",
+    title: "Bật tốc ở những pha quyết định.",
+    description: "Khám phá các lựa chọn hỗ trợ phản tạt nhanh, vung vợt chắc tay và kiểm soát hướng cầu tốt hơn.",
+    action: "Khám phá vợt",
+    to: paths.productsByCategory("vot-cau-long"),
+  },
+  {
+    image: heroFutureCourt,
+    eyebrow: "Chuẩn bị cho buổi tập",
+    title: "Giữ nhịp độ theo cách của bạn.",
+    description: "Từ giày bám sân đến vợt linh hoạt, chọn trang bị phù hợp để tự tin di chuyển qua từng set đấu.",
+    action: "Chọn trang bị",
+    to: paths.products,
+  },
+  {
+    image: heroFlatlay,
+    eyebrow: "Những món cần có",
+    title: "Hoàn thiện túi đồ tập.",
+    description: "Giày, ống cầu, quấn cán và phụ kiện thiết yếu được gom lại để bạn chuẩn bị gọn gàng trước khi ra sân.",
+    action: "Xem phụ kiện",
+    to: paths.productsByCategory("phu-kien-cau-long"),
+  },
+  {
+    image: heroTournament,
+    eyebrow: "Sẵn sàng thi đấu",
+    title: "Tự tin trong từng điểm số.",
+    description: "Để mục tiêu, ngân sách và lối chơi của bạn dẫn đường cho lựa chọn dụng cụ phù hợp.",
+    action: "Nhờ AI tư vấn",
     to: paths.aiAdvisor,
   },
 ];

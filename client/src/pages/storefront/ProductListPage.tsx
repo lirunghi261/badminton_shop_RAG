@@ -120,13 +120,16 @@ export function ProductListPage() {
               ]}
             />
           </div>
-          {(search || category !== "all" || brand !== "all" || params.sort !== "newest") && (
-            <div className="store-filter-meta">
+          <div className="store-filter-meta">
+            <span aria-live="polite">
+              {productsQuery.isPending ? "Đang tìm sản phẩm..." : `${productsQuery.data?.pagination.total ?? 0} sản phẩm phù hợp`}
+            </span>
+            {(search || category !== "all" || brand !== "all" || params.sort !== "newest") && (
               <Button type="link" icon={<ReloadOutlined />} onClick={() => setSearchParams({})}>
-                Xóa bộ lọc
+                Xóa tất cả bộ lọc
               </Button>
-            </div>
-          )}
+            )}
+          </div>
         </Card>
 
         {productsQuery.isError && (
