@@ -1,0 +1,82 @@
+.order-table-card {
+  overflow: hidden;
+  border: 1px solid #dce9f5;
+  box-shadow: 0 9px 30px rgba(15, 39, 64, 0.05);
+}
+
+.order-table-card > .ant-card-body { padding: 0; }
+.order-table-card .ant-table-wrapper { padding: 0 20px 8px; }
+.order-table-card .ant-table-thead > tr > th { background: #f7fbff; }
+
+.order-toolbar {
+  display: grid;
+  grid-template-columns: minmax(230px, 1fr) 170px 175px 160px 155px;
+  gap: 12px;
+  padding: 20px;
+  border-bottom: 1px solid #e5eef7;
+}
+
+.order-date-filter { grid-column: 1 / span 2; }
+
+.order-alert { margin: 16px 20px 0; }
+.order-code-cell,
+.order-customer-cell,
+.order-payment-cell,
+.order-product-cell {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.order-code-cell .ant-typography:last-child,
+.order-customer-cell .ant-typography:last-child,
+.order-payment-cell .ant-typography:last-child,
+.order-product-cell .ant-typography:last-child { font-size: 12px; }
+
+.order-status-tag { margin-inline-end: 0; border-radius: 999px; }
+.order-item-image { object-fit: contain; border: 1px solid #e5eef7; border-radius: 8px; background: #f7fbff; }
+.order-customer-note { margin-top: 18px; }
+
+.order-totals {
+  width: min(100%, 360px);
+  margin: 18px 0 0 auto;
+  display: grid;
+  gap: 8px;
+}
+
+.order-totals > span { display: flex; justify-content: space-between; gap: 20px; }
+.order-totals__grand {
+  margin-top: 5px;
+  padding-top: 12px;
+  border-top: 1px solid #dce9f5;
+  color: #0369a1;
+  font-size: 16px;
+}
+
+.order-workflow { display: grid; gap: 18px; }
+.order-workflow section {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid #dce9f5;
+  border-radius: 12px;
+  background: #fafdff;
+}
+
+.order-workflow section > .ant-typography { margin: 0; }
+.order-workflow section > .ant-select { width: min(100%, 360px); }
+.order-workflow section > .ant-btn,
+.order-workflow section > .ant-popconfirm-popup { justify-self: start; }
+
+@media (max-width: 1200px) {
+  .order-toolbar { grid-template-columns: 1fr 1fr 1fr; }
+  .order-toolbar .ant-input-affix-wrapper { grid-column: 1 / -1; }
+  .order-date-filter { grid-column: auto / span 2; }
+}
+
+@media (max-width: 700px) {
+  .order-toolbar { grid-template-columns: 1fr; }
+  .order-toolbar .ant-input-affix-wrapper { grid-column: auto; }
+  .order-date-filter { grid-column: auto; }
+  .order-table-card .ant-table-wrapper { padding-inline: 12px; }
+}

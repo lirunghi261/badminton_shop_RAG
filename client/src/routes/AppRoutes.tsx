@@ -37,8 +37,8 @@ const BrandManagementPage = lazy(() =>
 const UserManagementPage = lazy(() =>
   import("../pages/admin/users/UserManagementPage").then((module) => ({ default: module.UserManagementPage })),
 );
-const AdminPlaceholderPage = lazy(() =>
-  import("../pages/admin/AdminPlaceholderPage").then((module) => ({ default: module.AdminPlaceholderPage })),
+const OrderManagementPage = lazy(() =>
+  import("../pages/admin/orders/OrderManagementPage").then((module) => ({ default: module.OrderManagementPage })),
 );
 const NotFoundPage = lazy(() => import("../pages/errors/NotFoundPage").then((module) => ({ default: module.NotFoundPage })));
 
@@ -65,7 +65,7 @@ export function AppRoutes() {
             <Route path="products" element={<ProductManagementPage />} />
             <Route path="categories" element={<CategoryManagementPage />} />
             <Route path="brands" element={<BrandManagementPage />} />
-            <Route path="orders" element={<AdminPlaceholderPage />} />
+            <Route path="orders" element={<OrderManagementPage />} />
             <Route path="users" element={<UserManagementPage />} />
             <Route path="customers" element={<Navigate to={paths.admin.users} replace />} />
           </Route>

@@ -23,8 +23,8 @@ export async function getDashboardSummary(_request: Request, response: Response)
     database
       .collection("orders")
       .aggregate<{ total: number }>([
-        { $match: { status: "delivered", paymentStatus: "paid" } },
-        { $group: { _id: null, total: { $sum: "$totalAmount" } } },
+        { $match: { status: "completed", paymentStatus: "paid" } },
+        { $group: { _id: null, total: { $sum: "$total" } } },
       ])
       .toArray(),
   ]);

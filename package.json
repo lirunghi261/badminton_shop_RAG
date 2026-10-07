@@ -13,6 +13,7 @@
     "seed:admin": "npm run seed:admin -w server",
     "seed:catalog": "npm run seed:catalog -w server",
     "seed:products": "npm run seed:products -w server",
+    "seed:orders": "npm run seed:orders -w server",
     "migrate:catalog-images": "npm run migrate:catalog-images -w server",
     "rag:preview": "npm run rag:preview -w server"
   },

@@ -11,6 +11,7 @@
     "seed:admin": "tsx src/scripts/seedAdmin.ts",
     "seed:catalog": "tsx src/scripts/seedCatalog.ts",
     "seed:products": "tsx src/scripts/seedProducts.ts",
+    "seed:orders": "tsx src/scripts/seedOrders.ts",
     "migrate:catalog-images": "tsx src/scripts/migrateCatalogImagesToGridFS.ts",
     "rag:preview": "tsx src/scripts/previewRagData.ts"
   },
