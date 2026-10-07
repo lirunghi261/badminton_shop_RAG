@@ -1,3 +1,4 @@
+import { PhoneOutlined } from "@ant-design/icons";
 import { Form, Input, Modal, Select } from "antd";
 import { useEffect } from "react";
 import type {
@@ -33,6 +34,7 @@ export function UserFormModal({
       form.setFieldsValue({
         name: user.name,
         email: user.email,
+        phone: user.phone ?? "",
         role: user.role,
         status: user.status,
       });
@@ -92,6 +94,20 @@ export function UserFormModal({
           ]}
         >
           <Input placeholder="name@example.com" autoComplete="email" />
+        </Form.Item>
+
+        <Form.Item
+          label="Số điện thoại"
+          name="phone"
+          extra="Không bắt buộc. Hỗ trợ định dạng 09xxxxxxxx hoặc +84xxxxxxxxx."
+          rules={[
+            {
+              pattern: /^(?:(?:\+?84)|0)[-\s.()]?[35789](?:[-\s.]?\d){8}$/,
+              message: "Số điện thoại Việt Nam không hợp lệ.",
+            },
+          ]}
+        >
+          <Input prefix={<PhoneOutlined />} placeholder="Ví dụ: 0977 508 430" autoComplete="tel" />
         </Form.Item>
 
         {!isEditing && (

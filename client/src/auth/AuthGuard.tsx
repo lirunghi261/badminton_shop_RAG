@@ -18,7 +18,7 @@ export function AuthGuard() {
     return <AppLoader label="Đang kiểm tra đăng nhập" />;
   }
 
-  if (userQuery.isError) {
+  if (userQuery.isError || userQuery.data.role !== "admin") {
     return <Navigate to={paths.admin.login} state={{ from: location.pathname }} replace />;
   }
 

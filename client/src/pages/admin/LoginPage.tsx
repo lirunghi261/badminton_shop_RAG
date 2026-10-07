@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Alert, Button, Form, Input, Typography } from "antd";
 import axios from "axios";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { loginAdmin } from "../../api/auth/auth.api";
+import { loginAdmin, type AdminUser } from "../../api/auth/auth.api";
 import { currentUserQueryKey } from "../../auth/queryKeys";
 import { paths } from "../../routes/paths";
 
@@ -16,7 +16,7 @@ export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
-  const existingUser = queryClient.getQueryData(currentUserQueryKey);
+  const existingUser = queryClient.getQueryData<AdminUser>(currentUserQueryKey);
 
   const loginMutation = useMutation({
     mutationFn: loginAdmin,
@@ -27,7 +27,7 @@ export function LoginPage() {
     },
   });
 
-  if (existingUser) {
+  if (existingUser?.role === "admin") {
     return <Navigate to={paths.admin.root} replace />;
   }
 

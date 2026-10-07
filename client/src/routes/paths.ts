@@ -8,6 +8,8 @@ export const paths = {
   cart: "/cart",
   checkout: "/checkout",
   account: "/account",
+  login: "/login",
+  register: "/register",
   admin: {
     root: "/admin",
     login: "/admin/login",

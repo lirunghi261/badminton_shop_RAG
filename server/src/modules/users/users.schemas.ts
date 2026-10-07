@@ -1,4 +1,8 @@
 import { z } from "zod";
+import {
+  editableVietnamPhoneSchema,
+  optionalVietnamPhoneSchema,
+} from "../../utils/phone.js";
 
 export const listUsersQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -12,6 +16,7 @@ export const listUsersQuerySchema = z.object({
 export const createUserSchema = z.object({
   name: z.string().trim().min(2).max(100),
   email: z.string().trim().toLowerCase().email().max(160),
+  phone: optionalVietnamPhoneSchema,
   password: z.string().min(8).max(128),
   role: z.enum(["admin", "customer"]),
   status: z.enum(["active", "blocked"]).default("active"),
@@ -21,6 +26,7 @@ export const updateUserSchema = z
   .object({
     name: z.string().trim().min(2).max(100).optional(),
     email: z.string().trim().toLowerCase().email().max(160).optional(),
+    phone: editableVietnamPhoneSchema.optional(),
     role: z.enum(["admin", "customer"]).optional(),
     status: z.enum(["active", "blocked"]).optional(),
   })

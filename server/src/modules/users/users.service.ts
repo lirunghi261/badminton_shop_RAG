@@ -12,6 +12,7 @@ function serializeUser(user: {
   _id: Types.ObjectId;
   name: string;
   email: string;
+  phone?: string;
   role: UserRole;
   status: UserStatus;
   lastLoginAt?: Date | null;
@@ -22,6 +23,7 @@ function serializeUser(user: {
     id: user._id.toString(),
     name: user.name,
     email: user.email,
+    phone: user.phone ?? null,
     role: user.role,
     status: user.status,
     lastLoginAt: user.lastLoginAt ?? null,
@@ -36,8 +38,17 @@ function assertValidId(userId: string) {
   }
 }
 
-function isDuplicateKeyError(error: unknown): boolean {
+function isDuplicateKeyError(
+  error: unknown,
+): error is { code: number; keyPattern?: Record<string, number> } {
   return Boolean(error && typeof error === "object" && "code" in error && error.code === 11000);
+}
+
+function duplicateUserError(error: { keyPattern?: Record<string, number> }) {
+  if (error.keyPattern && "phone" in error.keyPattern) {
+    return new AppError("Số điện thoại này đã được sử dụng.", 409, "PHONE_ALREADY_EXISTS");
+  }
+  return new AppError("Email này đã được sử dụng.", 409, "EMAIL_ALREADY_EXISTS");
 }
 
 async function assertNotRemovingLastAdmin(user: User, nextRole?: UserRole, nextStatus?: UserStatus) {
@@ -67,14 +78,14 @@ export async function listUsers(query: ListUsersQuery) {
     deletedAt: null;
     role?: UserRole;
     status?: UserStatus;
-    $or?: Array<{ name: RegExp } | { email: RegExp }>;
+    $or?: Array<{ name: RegExp } | { email: RegExp } | { phone: RegExp }>;
   } = { deletedAt: null };
 
   if (query.role !== "all") filter.role = query.role;
   if (query.status !== "all") filter.status = query.status;
   if (query.search) {
     const expression = new RegExp(escapeRegex(query.search), "i");
-    filter.$or = [{ name: expression }, { email: expression }];
+    filter.$or = [{ name: expression }, { email: expression }, { phone: expression }];
   }
 
   const sortMap: Record<ListUsersQuery["sort"], Record<string, SortOrder>> = {
@@ -87,7 +98,7 @@ export async function listUsers(query: ListUsersQuery) {
 
   const [users, filteredTotal, total, customers, admins, active, blocked] = await Promise.all([
     UserModel.find(filter)
-      .select("name email role status lastLoginAt createdAt updatedAt")
+      .select("name email phone role status lastLoginAt createdAt updatedAt")
       .sort(sortMap[query.sort])
       .skip(skip)
       .limit(query.limit)
@@ -115,7 +126,7 @@ export async function listUsers(query: ListUsersQuery) {
 export async function getUserById(userId: string) {
   assertValidId(userId);
   const user = await UserModel.findOne({ _id: userId, deletedAt: null })
-    .select("name email role status lastLoginAt createdAt updatedAt")
+    .select("name email phone role status lastLoginAt createdAt updatedAt")
     .lean();
   if (!user) throw new AppError("Không tìm thấy người dùng.", 404, "USER_NOT_FOUND");
   return serializeUser(user);
@@ -126,6 +137,7 @@ export async function createUser(input: CreateUserInput) {
     const user = await UserModel.create({
       name: input.name,
       email: input.email,
+      ...(input.phone ? { phone: input.phone } : {}),
       password: await bcrypt.hash(input.password, 12),
       role: input.role,
       status: input.status,
@@ -133,7 +145,7 @@ export async function createUser(input: CreateUserInput) {
     return serializeUser(user);
   } catch (error) {
     if (isDuplicateKeyError(error)) {
-      throw new AppError("Email này đã được sử dụng.", 409, "EMAIL_ALREADY_EXISTS");
+      throw duplicateUserError(error);
     }
     throw error;
   }
@@ -157,6 +169,7 @@ export async function updateUser(userId: string, currentAdminId: string, input: 
 
   if (input.name !== undefined) user.name = input.name;
   if (input.email !== undefined) user.email = input.email;
+  if (input.phone !== undefined) user.phone = input.phone ?? undefined;
   if (input.role !== undefined) user.role = input.role;
   if (input.status !== undefined) user.status = input.status;
   if (input.status === "blocked" || input.role === "customer") user.refreshTokenHash = null;
@@ -166,7 +179,7 @@ export async function updateUser(userId: string, currentAdminId: string, input: 
     return serializeUser(user);
   } catch (error) {
     if (isDuplicateKeyError(error)) {
-      throw new AppError("Email này đã được sử dụng.", 409, "EMAIL_ALREADY_EXISTS");
+      throw duplicateUserError(error);
     }
     throw error;
   }

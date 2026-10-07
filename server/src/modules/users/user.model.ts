@@ -6,6 +6,7 @@ export type UserStatus = "active" | "blocked";
 export interface User {
   name: string;
   email: string;
+  phone?: string;
   password: string;
   role: UserRole;
   status: UserStatus;
@@ -29,6 +30,14 @@ const userSchema = new Schema<User, UserModel>(
       lowercase: true,
       trim: true,
       index: true,
+    },
+    phone: {
+      type: String,
+      unique: true,
+      sparse: true,
+      trim: true,
+      index: true,
+      default: undefined,
     },
     password: { type: String, required: true, select: false },
     role: { type: String, enum: ["admin", "customer"], default: "customer", index: true },

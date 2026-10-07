@@ -20,6 +20,9 @@ const AiAdvisorPage = lazy(() =>
 const AccountPage = lazy(() =>
   import("../pages/storefront/AccountPage").then((module) => ({ default: module.AccountPage })),
 );
+const CustomerAuthPage = lazy(() =>
+  import("../pages/storefront/CustomerAuthPage").then((module) => ({ default: module.CustomerAuthPage })),
+);
 const CheckoutPage = lazy(() =>
   import("../pages/storefront/CheckoutPage").then((module) => ({ default: module.CheckoutPage })),
 );
@@ -54,10 +57,11 @@ export function AppRoutes() {
           <Route path="cart" element={<CartPage />} />
           <Route path="checkout" element={<CheckoutPage />} />
           <Route path="account" element={<AccountPage />} />
+          <Route path="login" element={<CustomerAuthPage mode="login" />} />
+          <Route path="register" element={<CustomerAuthPage mode="register" />} />
         </Route>
 
         <Route path={paths.admin.login} element={<AdminLoginPage />} />
-        <Route path="/login" element={<Navigate to={paths.admin.login} replace />} />
 
         <Route element={<AuthGuard />}>
           <Route path={paths.admin.root} element={<AdminLayout />}>

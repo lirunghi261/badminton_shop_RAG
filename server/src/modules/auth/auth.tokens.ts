@@ -57,8 +57,24 @@ export function setAuthCookies(response: Response, accessToken: string, refreshT
   });
 }
 
+export function setCustomerAuthCookies(response: Response, accessToken: string, refreshToken: string): void {
+  response.cookie("customerAccessToken", accessToken, {
+    ...baseCookieOptions,
+    maxAge: 15 * 60 * 1000,
+  });
+  response.cookie("customerRefreshToken", refreshToken, {
+    ...baseCookieOptions,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+}
+
 export function clearAuthCookies(response: Response): void {
   response.clearCookie("accessToken", baseCookieOptions);
   response.clearCookie("refreshToken", baseCookieOptions);
+}
+
+export function clearCustomerAuthCookies(response: Response): void {
+  response.clearCookie("customerAccessToken", baseCookieOptions);
+  response.clearCookie("customerRefreshToken", baseCookieOptions);
 }
 

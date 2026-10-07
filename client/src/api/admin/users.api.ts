@@ -8,6 +8,7 @@ export interface ManagedUser {
   id: string;
   name: string;
   email: string;
+  phone: string | null;
   role: UserRole;
   status: UserStatus;
   lastLoginAt: string | null;
@@ -39,6 +40,7 @@ export interface UserListResult {
 export interface CreateUserInput {
   name: string;
   email: string;
+  phone?: string | null;
   password: string;
   role: UserRole;
   status: UserStatus;

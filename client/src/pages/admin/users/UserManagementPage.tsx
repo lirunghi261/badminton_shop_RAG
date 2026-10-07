@@ -168,6 +168,7 @@ export function UserManagementPage() {
               {user.id === currentAdmin?.id && <Tag color="blue">Bạn</Tag>}
             </Space>
             <Typography.Text type="secondary">{user.email}</Typography.Text>
+            {user.phone && <Typography.Text type="secondary">{user.phone}</Typography.Text>}
           </div>
         </Space>
       ),
@@ -323,7 +324,7 @@ export function UserManagementPage() {
             allowClear
             value={searchInput}
             prefix={<SearchOutlined />}
-            placeholder="Tìm theo tên hoặc email..."
+            placeholder="Tìm theo tên, email hoặc số điện thoại..."
             onChange={(event) => setSearchInput(event.target.value)}
           />
           <Select

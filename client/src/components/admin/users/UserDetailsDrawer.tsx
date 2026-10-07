@@ -2,6 +2,7 @@ import {
   CalendarOutlined,
   ClockCircleOutlined,
   MailOutlined,
+  PhoneOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
@@ -65,6 +66,9 @@ export function UserDetailsDrawer({ userId, onClose }: UserDetailsDrawerProps) {
             </Descriptions.Item>
             <Descriptions.Item label={<><MailOutlined /> Email</>}>
               {user.email}
+            </Descriptions.Item>
+            <Descriptions.Item label={<><PhoneOutlined /> Số điện thoại</>}>
+              {user.phone || "Chưa cập nhật"}
             </Descriptions.Item>
             <Descriptions.Item label={<><CalendarOutlined /> Ngày đăng ký</>}>
               {formatDateTime(user.createdAt)}

@@ -247,7 +247,7 @@
 
 .customer-alert { margin: 16px 20px 0; }
 .customer-name-cell { display: flex; flex-direction: column; min-width: 190px; }
-.customer-name-cell .ant-typography:last-child { font-size: 12px; }
+.customer-name-cell > .ant-typography { font-size: 12px; }
 .customer-avatar { background: linear-gradient(145deg, #0284c7, #38bdf8); }
 .customer-status-tag { margin-inline-end: 0; border-radius: 999px; }
 .customer-table-card .ant-table-wrapper { padding: 0 20px 8px; }

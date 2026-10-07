@@ -32,6 +32,36 @@ export const authenticate: RequestHandler = async (request, _response, next) => 
   }
 };
 
+export const authenticateCustomer: RequestHandler = async (request, _response, next) => {
+  const token = request.cookies?.customerAccessToken as string | undefined;
+  if (!token) {
+    next(new AppError("Bạn chưa đăng nhập.", 401, "UNAUTHENTICATED"));
+    return;
+  }
+
+  try {
+    const payload = verifyAccessToken(token);
+    const user = await UserModel.findOne({
+      _id: payload.sub,
+      role: "customer",
+      status: "active",
+      deletedAt: null,
+    })
+      .select("role")
+      .lean();
+
+    if (!user || payload.role !== "customer") {
+      next(new AppError("Phiên khách hàng không còn hợp lệ.", 401, "CUSTOMER_ACCESS_CHANGED"));
+      return;
+    }
+
+    request.auth = { userId: payload.sub, role: "customer" };
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
 export function authorize(...roles: UserRole[]): RequestHandler {
   return (request, _response, next) => {
     if (!request.auth || !roles.includes(request.auth.role)) {
