@@ -1088,6 +1088,12 @@
   font-weight: 750;
 }
 
+/* Keep the featured card CTA anchored, but let compact cards grow with their copy. */
+.category-card:not(.category-card-featured) .category-arrow {
+  position: static;
+  align-self: flex-start;
+}
+
 .category-card .category-arrow span { font-size: 18px; transition: transform 180ms ease; }
 .category-card:hover .category-arrow span { transform: translateX(4px); }
 
