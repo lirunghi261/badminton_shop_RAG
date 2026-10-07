@@ -9,7 +9,7 @@ import {
 } from "@ant-design/icons";
 import { Badge, Button, Drawer, Input } from "antd";
 import { useState } from "react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { StoreLogo } from "../components/storefront/StoreLogo";
 import { useCart } from "../cart/useCart";
 import { paths } from "../routes/paths";
@@ -51,19 +51,21 @@ export function StorefrontLayout() {
         <div className="store-utility-bar"><div className="store-container"><span><PhoneOutlined /> Hotline: <strong>0977 508 430</strong></span><span><EnvironmentOutlined /> Hệ thống cửa hàng</span></div></div>
         <div className="store-container store-header-inner">
           <StoreLogo />
-          <div className="store-header-search">
+          <form className="store-header-search" role="search" onSubmit={(event) => { event.preventDefault(); submitSearch(); }}>
             <Input
+              name="store-search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              onPressEnter={submitSearch}
-              placeholder="Tìm sản phẩm, thương hiệu hoặc SKU..."
-              suffix={<Button type="text" shape="circle" icon={<SearchOutlined />} onClick={submitSearch} aria-label="Tìm kiếm" />}
+              autoComplete="off"
+              spellCheck={false}
+              placeholder="Tìm sản phẩm, thương hiệu hoặc SKU…"
+              suffix={<Button type="text" htmlType="submit" shape="circle" icon={<SearchOutlined />} aria-label="Tìm kiếm" />}
             />
-          </div>
+          </form>
           <div className="store-actions">
-            <Button className="store-action-button" type="text" icon={<UserOutlined />} aria-label="Tài khoản" onClick={() => navigate(paths.account)}><span>Tài khoản</span></Button>
+            <Link className="store-action-link" to={paths.account} aria-label="Tài khoản"><UserOutlined aria-hidden="true" /><span>Tài khoản</span></Link>
             <Badge count={itemCount} showZero={false}>
-              <Button className="store-action-button" type="text" icon={<ShoppingCartOutlined />} aria-label="Giỏ hàng" onClick={() => navigate(paths.cart)}><span>Giỏ hàng</span></Button>
+              <Link className="store-action-link" to={paths.cart} aria-label={`Giỏ hàng, ${itemCount} sản phẩm`}><ShoppingCartOutlined aria-hidden="true" /><span>Giỏ hàng</span></Link>
             </Badge>
             <Button className="mobile-menu-button" type="text" shape="circle" icon={<MenuOutlined />} aria-label="Mở menu" onClick={() => setMenuOpen(true)} />
           </div>
@@ -87,7 +89,7 @@ export function StorefrontLayout() {
         </div>
       </footer>
 
-      <Drawer title="Danh mục" placement="right" open={menuOpen} onClose={() => setMenuOpen(false)}>
+      <Drawer rootClassName="store-mobile-drawer" title="Danh mục" placement="right" open={menuOpen} onClose={() => setMenuOpen(false)}>
         <div className="mobile-nav">{navLinks}</div>
       </Drawer>
     </div>

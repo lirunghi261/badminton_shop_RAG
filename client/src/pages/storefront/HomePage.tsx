@@ -9,6 +9,7 @@ import heroSmash from "../../assets/storefront-hero-smash-ocean.png";
 import { SeoHead } from "../../components/common/SeoHead";
 import { HomeFeaturedProducts } from "../../components/storefront/HomeFeaturedProducts";
 import { HomeHeroCarousel } from "../../components/storefront/HomeHeroCarousel";
+import { HomeShoppingJourney } from "../../components/storefront/HomeShoppingJourney";
 import { paths } from "../../routes/paths";
 
 const categories = [
@@ -92,6 +93,7 @@ export function HomePage() {
           <Col xs={24} md={8}><div><RobotOutlined /><span><strong>Tư vấn thông minh</strong>Gợi ý theo lối chơi của bạn</span></div></Col>
         </Row></div>
       </section>
+      <HomeShoppingJourney />
       <section className="home-section home-categories">
         <div className="store-container">
           <div className="section-heading"><div><span className="eyebrow">Danh mục nổi bật</span><h2>Sẵn sàng cho sân đấu</h2></div><Link to={paths.products}>Xem tất cả →</Link></div>

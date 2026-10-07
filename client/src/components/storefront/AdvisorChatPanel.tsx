@@ -125,8 +125,10 @@ export function AdvisorChatPanel({ products }: AdvisorChatPanelProps) {
         </div>
         <div className="advisor-chat-input">
           <Input.TextArea
+            name="advisor-question"
             value={value}
             maxLength={300}
+            autoComplete="off"
             autoSize={{ minRows: 1, maxRows: 4 }}
             onChange={(event) => setValue(event.target.value)}
             onPressEnter={(event) => {
@@ -134,7 +136,7 @@ export function AdvisorChatPanel({ products }: AdvisorChatPanelProps) {
               event.preventDefault();
               send();
             }}
-            placeholder="Ví dụ: Tôi mới chơi, cần vợt dễ thuần dưới 2 triệu..."
+            placeholder="Ví dụ: Tôi mới chơi, cần vợt dễ thuần dưới 2 triệu…"
             aria-label="Nhu cầu tư vấn sản phẩm"
           />
           <Button type="primary" icon={<SendOutlined />} disabled={!value.trim()} onClick={() => send()}>

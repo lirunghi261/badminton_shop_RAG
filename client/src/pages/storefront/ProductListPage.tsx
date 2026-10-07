@@ -25,9 +25,12 @@ function ProductSearch({ initialSearch, onSearch }: ProductSearchProps) {
 
   return (
     <Input.Search
+      name="product-search"
       allowClear
       enterButton={<SearchOutlined />}
-      placeholder="Tìm theo tên sản phẩm hoặc SKU"
+      autoComplete="off"
+      spellCheck={false}
+      placeholder="Tìm theo tên sản phẩm hoặc SKU…"
       value={value}
       onChange={(event) => setValue(event.target.value)}
       onSearch={() => onSearch(value)}
