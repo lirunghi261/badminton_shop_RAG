@@ -61,6 +61,17 @@ export interface StorefrontProductListParams {
   category: string;
   brand: string;
   sort: "newest" | "price-asc" | "price-desc";
+  minPrice?: number;
+  maxPrice?: number;
+  inStock?: "true" | "false";
+  facets?: string;
+}
+
+export interface StorefrontProductFacet {
+  key: string;
+  label: string;
+  scope: "variant" | "specification";
+  options: string[];
 }
 
 export interface StorefrontProductListResult {
@@ -68,6 +79,7 @@ export interface StorefrontProductListResult {
   filters: {
     categories: Array<Pick<StorefrontCatalogReference, "name" | "slug">>;
     brands: Array<Pick<StorefrontCatalogReference, "name" | "slug">>;
+    facets: StorefrontProductFacet[];
   };
   pagination: { page: number; limit: number; total: number; totalPages: number };
 }

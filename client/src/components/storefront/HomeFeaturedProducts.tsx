@@ -21,7 +21,7 @@ export function HomeFeaturedProducts() {
     <section className="home-section home-featured-products" aria-labelledby="home-products-heading">
       <div className="store-container">
         <div className="section-heading">
-          <div><span className="eyebrow">Hàng mới cập nhật</span><h2 id="home-products-heading">Sản phẩm cầu lông nổi bật</h2></div>
+          <div><h2 id="home-products-heading">Sản phẩm cầu lông nổi bật</h2></div>
           <Link to={viewAllPath}>Xem tất cả <ArrowRightOutlined /></Link>
         </div>
         {categories.length ? (

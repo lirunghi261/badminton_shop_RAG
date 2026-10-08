@@ -19,10 +19,10 @@ createRoot(document.getElementById("root")!).render(
     <ConfigProvider
       theme={{
         token: {
-          colorPrimary: "#0369a1",
+          colorPrimary: "#0f5f8f",
           borderRadius: 10,
           colorText: "#0f2740",
-          fontFamily: "Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+          fontFamily: "'Segoe UI Variable', Aptos, 'Segoe UI', system-ui, -apple-system, sans-serif",
         },
       }}
     >

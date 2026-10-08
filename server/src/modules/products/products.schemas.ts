@@ -83,6 +83,13 @@ export const listPublicProductsQuerySchema = z.object({
   category: z.string().trim().max(200).default("all"),
   brand: z.string().trim().max(200).default("all"),
   sort: z.enum(["newest", "price-asc", "price-desc"]).default("newest"),
+  minPrice: z.coerce.number().min(0).optional(),
+  maxPrice: z.coerce.number().min(0).optional(),
+  inStock: z.enum(["true", "false"]).default("false").transform((value) => value === "true"),
+  facets: z.string().trim().max(2000).default("[]"),
+}).refine((value) => value.minPrice == null || value.maxPrice == null || value.minPrice <= value.maxPrice, {
+  message: "Khoảng giá không hợp lệ.",
+  path: ["maxPrice"],
 });
 
 export type CreateProductInput = z.infer<typeof createProductSchema>;

@@ -1,5 +1,5 @@
 import { ArrowRightOutlined, CheckCircleFilled, PictureOutlined } from "@ant-design/icons";
-import { Card, Tag } from "antd";
+import { Card } from "antd";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import type { StorefrontProduct } from "../../api/storefront/products.api";
@@ -31,19 +31,20 @@ export function ProductCard({ product }: ProductCardProps) {
           ) : (
             <span className="store-product-image-fallback"><PictureOutlined /> Chưa có ảnh</span>
           )}
-          <Tag className="store-product-brand">{product.brand.name}</Tag>
-          {hasSale && <span className="store-product-sale-badge">Ưu đãi</span>}
         </div>
         <div className="store-product-content">
+          <div className="store-product-card-meta">
+            <span className="store-product-brand">{product.brand.name}</span>
+            {hasSale && <span className="store-product-sale-badge">Ưu đãi</span>}
+          </div>
           <span className="store-product-category">{product.category.name}</span>
           <h3>{product.name}</h3>
-          {product.shortDescription && <p>{product.shortDescription}</p>}
           <div className="store-product-bottom">
             <div className="store-product-price">
               <strong>{formatCurrency(startingPrice)}</strong>
               {hasSale && <del>{formatCurrency(regularPrice)}</del>}
             </div>
-            <span className="store-product-detail-link">Xem chi tiết <ArrowRightOutlined aria-hidden="true" /></span>
+            <span className="store-product-detail-link" aria-hidden="true"><ArrowRightOutlined /></span>
           </div>
           <span className={product.totalStock > 0 ? "store-product-stock" : "store-product-stock unavailable"}><CheckCircleFilled /> {product.totalStock > 0 ? (lowStock ? "Sắp hết hàng" : "Còn hàng") : "Tạm hết hàng"}</span>
         </div>

@@ -11,6 +11,7 @@ import {
 } from "../../api/auth/auth.api";
 import { currentCustomerQueryKey } from "../../auth/queryKeys";
 import { paths } from "../../routes/paths";
+import authImage from "../../assets/storefront-hero-equipment-ocean.webp";
 import "../../styles/storefront-auth.css";
 
 type AuthMode = "login" | "register";
@@ -72,6 +73,13 @@ export function CustomerAuthPage({ mode }: { mode: AuthMode }) {
   return (
     <section className="customer-auth-page">
       <div className="customer-auth-card">
+        <aside className="customer-auth-visual" aria-label="Trang bị cầu lông Badminton Shop">
+          <img src={authImage} alt="Vợt, giày và phụ kiện cầu lông" />
+          <div>
+            <strong>Chọn đúng dụng cụ.</strong>
+            <span>Tự tin hơn trong từng buổi tập.</span>
+          </div>
+        </aside>
         <div className="customer-auth-form-panel">
           <nav className="customer-auth-tabs" aria-label="Tài khoản">
             <Link className={mode === "login" ? "active" : ""} to={paths.login}>Đăng nhập</Link>

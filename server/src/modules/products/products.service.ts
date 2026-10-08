@@ -148,12 +148,74 @@ function publicProductPayload<T extends { _id: Types.ObjectId; variants: Product
   };
 }
 
+interface PublicFacetSelection {
+  scope: "variant" | "specification";
+  key: string;
+  values: string[];
+}
+
+function parsePublicFacets(raw: string, definitions: CategoryAttribute[]): PublicFacetSelection[] {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return [];
+  }
+  if (!Array.isArray(parsed)) return [];
+  const definitionMap = new Map(definitions.filter((item) => item.filterable).map((item) => [`${item.scope}:${item.key}`, item]));
+  return parsed.flatMap((item): PublicFacetSelection[] => {
+    if (!item || typeof item !== "object") return [];
+    const candidate = item as Partial<PublicFacetSelection>;
+    if ((candidate.scope !== "variant" && candidate.scope !== "specification") || typeof candidate.key !== "string" || !Array.isArray(candidate.values)) return [];
+    const definition = definitionMap.get(`${candidate.scope}:${candidate.key}`);
+    if (!definition) return [];
+    const values = candidate.values
+      .filter((value): value is string => typeof value === "string")
+      .map((value) => value.trim())
+      .filter((value) => value && (!definition.options.length || definition.options.includes(value)))
+      .slice(0, 20);
+    return values.length ? [{ scope: candidate.scope, key: candidate.key, values: [...new Set(values)] }] : [];
+  }).slice(0, 12);
+}
+
+function facetValue(value: string, definition: CategoryAttribute) {
+  if (definition.dataType === "number") {
+    const number = Number(value);
+    return Number.isFinite(number) ? number : value;
+  }
+  if (definition.dataType === "boolean") return value === "true";
+  return value;
+}
+
+function availableFacetOptions(
+  products: Array<{ specifications: ProductSpecification[]; variants: ProductVariant[] }>,
+  definition: CategoryAttribute,
+) {
+  const values = new Set<string>();
+  for (const product of products) {
+    if (definition.scope === "specification") {
+      product.specifications.filter((item) => item.key === definition.key).forEach((item) => values.add(String(item.value)));
+    } else {
+      product.variants.forEach((variant) => {
+        variant.attributes.filter((item) => item.key === definition.key).forEach((item) => values.add(String(item.value)));
+      });
+    }
+  }
+  const ordered = definition.options.length
+    ? definition.options.filter((option) => values.has(option))
+    : [...values].sort((left, right) => left.localeCompare(right, "vi", { numeric: true }));
+  return ordered.slice(0, 24);
+}
+
 export async function listPublicProducts(query: ListPublicProductsQuery) {
   const filter: Record<string, unknown> = { deletedAt: null, status: "active" };
   const [category, brand] = await Promise.all([
     query.category === "all"
       ? null
-      : CategoryModel.findOne({ slug: query.category, status: "active", deletedAt: null }, "_id").lean(),
+      : CategoryModel.findOne(
+        { slug: query.category, status: "active", deletedAt: null },
+        "_id name slug description imageUrl attributes",
+      ).lean(),
     query.brand === "all"
       ? null
       : BrandModel.findOne({ slug: query.brand, status: "active", deletedAt: null }, "_id").lean(),
@@ -169,6 +231,30 @@ export async function listPublicProducts(query: ListPublicProductsQuery) {
     const regex = new RegExp(query.search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
     filter.$or = [{ name: regex }, { "variants.sku": regex }];
   }
+  if (query.minPrice != null || query.maxPrice != null) {
+    filter.basePrice = {
+      ...(query.minPrice != null ? { $gte: query.minPrice } : {}),
+      ...(query.maxPrice != null ? { $lte: query.maxPrice } : {}),
+    };
+  }
+
+  const baseAndFilters: Record<string, unknown>[] = [];
+  if (query.inStock) baseAndFilters.push({ variants: { $elemMatch: { stock: { $gt: 0 } } } });
+  const facetSourceFilter: Record<string, unknown> = { ...filter };
+  if (baseAndFilters.length) facetSourceFilter.$and = [...baseAndFilters];
+
+  const facetDefinitions = category?.attributes.filter((item) => item.filterable) ?? [];
+  const facetSelections = parsePublicFacets(query.facets, facetDefinitions);
+  const definitionMap = new Map(facetDefinitions.map((item) => [`${item.scope}:${item.key}`, item]));
+  const selectedFacetFilters = facetSelections.map((selection) => {
+    const definition = definitionMap.get(`${selection.scope}:${selection.key}`)!;
+    const values = selection.values.map((value) => facetValue(value, definition));
+    return selection.scope === "specification"
+      ? { specifications: { $elemMatch: { key: selection.key, value: { $in: values } } } }
+      : { variants: { $elemMatch: { attributes: { $elemMatch: { key: selection.key, value: { $in: values } } } } } };
+  });
+  const allAndFilters = [...baseAndFilters, ...selectedFacetFilters];
+  if (allAndFilters.length) filter.$and = allAndFilters;
 
   const sort: Record<string, 1 | -1> = query.sort === "price-asc"
     ? { basePrice: 1 }
@@ -177,7 +263,11 @@ export async function listPublicProducts(query: ListPublicProductsQuery) {
       : { createdAt: -1 };
   const skip = (query.page - 1) * query.limit;
   const activeFilter = { deletedAt: null, status: "active" as const };
-  const [items, total, categories, brands] = await Promise.all([
+  const relevantBrandIds = await ProductModel.distinct("brand", {
+    ...activeFilter,
+    ...(category ? { category: category._id } : {}),
+  });
+  const [items, total, categories, brands, facetProducts] = await Promise.all([
     ProductModel.find(filter)
       .populate("category", "name slug")
       .populate("brand", "name slug")
@@ -187,7 +277,10 @@ export async function listPublicProducts(query: ListPublicProductsQuery) {
       .lean(),
     ProductModel.countDocuments(filter),
     CategoryModel.find(activeFilter, "name slug").sort({ sortOrder: 1, name: 1 }).lean(),
-    BrandModel.find(activeFilter, "name slug").sort({ sortOrder: 1, name: 1 }).lean(),
+    BrandModel.find({ ...activeFilter, _id: { $in: relevantBrandIds } }, "name slug").sort({ sortOrder: 1, name: 1 }).lean(),
+    category
+      ? ProductModel.find(facetSourceFilter, "specifications variants.attributes").limit(500).lean()
+      : Promise.resolve([]),
   ]);
 
   return {
@@ -195,6 +288,14 @@ export async function listPublicProducts(query: ListPublicProductsQuery) {
     filters: {
       categories: categories.map((item) => ({ name: item.name, slug: item.slug })),
       brands: brands.map((item) => ({ name: item.name, slug: item.slug })),
+      facets: facetDefinitions
+        .map((definition) => ({
+          key: definition.key,
+          label: definition.label,
+          scope: definition.scope,
+          options: availableFacetOptions(facetProducts, definition),
+        }))
+        .filter((facet) => facet.options.length > 0),
     },
     pagination: { page: query.page, limit: query.limit, total, totalPages: Math.max(1, Math.ceil(total / query.limit)) },
   };

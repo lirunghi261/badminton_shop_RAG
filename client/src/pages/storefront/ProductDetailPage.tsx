@@ -59,7 +59,7 @@ function ProductDetailContent({ product }: { product: StorefrontProduct }) {
       <div className="store-container">
         <Link className="store-back-link" to={paths.products}><ArrowLeftOutlined /> Tất cả sản phẩm</Link>
         <Row gutter={[38, 32]}>
-          <Col xs={24} lg={8}>
+          <Col xs={24} lg={11}>
             <div className="store-product-gallery">
               <div className="store-product-main-image">
                 {activeImage && !imageFailed ? (
@@ -84,7 +84,7 @@ function ProductDetailContent({ product }: { product: StorefrontProduct }) {
               )}
             </div>
           </Col>
-          <Col xs={24} lg={10}>
+          <Col xs={24} lg={13}>
             <div className="store-product-info">
               <div className="store-product-breadcrumb"><span>{product.category.name}</span><span> / </span><span>{product.brand.name}</span></div>
               <h1>{product.name}</h1>
@@ -110,7 +110,7 @@ function ProductDetailContent({ product }: { product: StorefrontProduct }) {
                         onClick={() => { setSelectedSku(variant.sku); setQuantity(1); }}
                         className={selectedVariant?.sku === variant.sku ? "active" : ""}
                         aria-pressed={selectedVariant?.sku === variant.sku}
-                        aria-label={`${getVariantName(variant)} — ${variant.stock > 0 ? `còn ${variant.stock} sản phẩm` : "tạm hết hàng"}`}
+                        aria-label={`${getVariantName(variant)} - ${variant.stock > 0 ? `còn ${variant.stock} sản phẩm` : "tạm hết hàng"}`}
                       >
                         {variant.colorHex && <i style={{ backgroundColor: variant.colorHex }} />}
                         <span>{getVariantName(variant)}</span>
@@ -122,9 +122,9 @@ function ProductDetailContent({ product }: { product: StorefrontProduct }) {
               )}
 
               {isInStock && <ProductOfferPanel quantity={quantity} stock={selectedStock} onQuantityChange={changeQuantity} onAddToCart={addToCart} />}
+              <ProductAvailabilityPanel stock={selectedStock} variantName={selectedVariant ? getVariantName(selectedVariant) : "Đang cập nhật"} />
             </div>
           </Col>
-          <Col xs={24} lg={6}><ProductAvailabilityPanel stock={selectedStock} variantName={selectedVariant ? getVariantName(selectedVariant) : "Đang cập nhật"} /></Col>
         </Row>
 
         <Row gutter={[24, 24]} className="store-product-detail-sections">

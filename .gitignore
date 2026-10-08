@@ -9,3 +9,5 @@ server/uploads/
 .DS_Store
 .idea/
 .vscode/
+# Playwright CLI output (may contain credentials)
+.playwright-cli/

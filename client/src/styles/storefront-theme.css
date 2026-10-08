@@ -1,0 +1,100 @@
+.store-shell {
+  --ocean-950: #071f35;
+  --ocean-900: #0b2d4a;
+  --ocean-800: #104667;
+  --ocean-700: #0f5f8f;
+  --ocean-600: #1479ae;
+  --ocean-500: #2298ce;
+  --ocean-100: #dff1f8;
+  --ocean-50: #eff8fc;
+  --ink: #0b2239;
+  --muted: #60788b;
+  --line: #dbe7ef;
+  --surface: #ffffff;
+  --canvas: #f6f9fc;
+  --radius-card: 16px;
+  --radius-control: 10px;
+  --shadow-soft: 0 16px 44px rgba(14, 66, 99, 0.08);
+  color: var(--ink);
+  background: var(--canvas);
+  font-family: "Segoe UI Variable", Aptos, "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+.store-shell > main { overflow: clip; }
+.store-shell h1,
+.store-shell h2,
+.store-shell h3,
+.store-shell p { text-wrap: pretty; }
+.store-shell h1,
+.store-shell h2,
+.store-shell h3 { color: var(--ink); }
+.store-shell a { text-underline-offset: 3px; }
+
+.store-shell .store-container {
+  width: min(1380px, calc(100% - 48px));
+  margin-inline: auto;
+}
+
+.store-shell .ant-btn,
+.store-shell .ant-input-affix-wrapper,
+.store-shell .ant-select-selector,
+.store-shell .ant-input,
+.store-shell .ant-input-number {
+  border-radius: var(--radius-control);
+}
+
+.store-shell .ant-btn-primary {
+  border-color: var(--ocean-700);
+  background: var(--ocean-700);
+  box-shadow: none;
+  font-weight: 700;
+}
+
+.store-shell .ant-btn-primary:not(:disabled):hover {
+  border-color: var(--ocean-800);
+  background: var(--ocean-800);
+}
+
+.store-shell :is(button, a, .ant-btn):active { transform: translateY(1px); }
+.store-shell :is(a, button, input, textarea, .ant-select-selector):focus-visible {
+  outline: 3px solid rgba(34, 152, 206, 0.28);
+  outline-offset: 3px;
+}
+
+.store-shell .eyebrow {
+  color: var(--ocean-600);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.store-shell .screen-loader { background: var(--canvas); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .store-shell .home-hero-content,
+  .store-shell .store-catalog-hero-content,
+  .store-shell .advisor-page-heading {
+    animation: storefront-enter 560ms cubic-bezier(.16, 1, .3, 1) both;
+  }
+
+  @keyframes storefront-enter {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .store-shell *,
+  .store-shell *::before,
+  .store-shell *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .store-shell .store-container { width: min(100% - 28px, 1380px); }
+}

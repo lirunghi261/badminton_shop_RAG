@@ -1,0 +1,239 @@
+.store-shell .home-hero-carousel {
+  min-height: 0;
+  aspect-ratio: 3 / 1;
+  background: var(--ocean-950);
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+}
+.store-shell .home-hero-carousel.is-dragging { cursor: grabbing; }
+.store-shell .home-hero-carousel > .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.store-shell .home-hero-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  transition: transform 520ms cubic-bezier(.22, .72, .18, 1);
+  will-change: transform;
+}
+.store-shell .home-hero-track.without-transition { transition: none; }
+.store-shell .home-hero-slide {
+  position: relative;
+  min-width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+.store-shell .home-hero-slide-link { display: block; width: 100%; height: 100%; -webkit-user-drag: none; }
+.store-shell .home-hero-image {
+  opacity: 1;
+  object-position: center;
+  transform: none;
+  transition: none;
+  will-change: auto;
+}
+.store-shell .home-hero-carousel :is(a, button) { user-select: auto; }
+.store-shell .home-hero-dots { gap: 2px; }
+.store-shell .home-hero-dots button {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.store-shell .home-hero-dots button::after {
+  width: 20px;
+  height: 3px;
+  border-radius: 3px;
+}
+.store-shell .home-hero-dots button.active { width: 36px; background: transparent; }
+.store-shell .home-hero-dots button.active::after { width: 28px; }
+
+.store-shell .home-service-strip { position: relative; z-index: 2; margin-top: 0; padding-top: 14px; background: #fff; }
+.store-shell .home-service-strip .store-container {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+}
+.store-shell .home-service-strip .ant-col > div { min-height: 76px; border-color: var(--line); }
+.store-shell .home-service-strip strong { color: var(--ink); }
+.store-shell .home-service-strip span { color: var(--muted); }
+.store-shell .home-service-strip .anticon { color: var(--ocean-600); }
+
+.store-shell .home-section { padding: 78px 0; }
+.store-shell .section-heading { align-items: center; margin-bottom: 26px; }
+.store-shell .section-heading h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(30px, 3.8vw, 48px);
+  font-weight: 720;
+  letter-spacing: -.045em;
+  line-height: 1.08;
+}
+.store-shell .section-heading > a { color: var(--ocean-700); font-size: 13px; }
+
+.store-shell .home-featured-products { padding: 86px 0 88px; background: #fff; }
+.store-shell .home-product-category-tabs { margin-bottom: 25px; gap: 6px; }
+.store-shell .home-product-category-tabs button {
+  min-height: 36px;
+  padding: 0 13px;
+  border-color: var(--line);
+  border-radius: 9px;
+  background: #fff;
+  color: #4c687b;
+}
+.store-shell .home-product-category-tabs button.active { border-color: var(--ocean-700); background: var(--ocean-700); color: #fff; }
+.store-shell .home-product-grid,
+.store-shell .store-product-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
+
+.store-shell .home-advisor-section { padding: 0 0 88px; background: #fff; }
+.store-shell .home-advisor-panel {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(290px, .55fr);
+  gap: 54px;
+  overflow: hidden;
+  padding: 46px 50px;
+  border: 1px solid #cfe3ed;
+  border-radius: var(--radius-card);
+  background: #eef7fb;
+}
+.store-shell .home-advisor-panel::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 4px;
+  background: var(--ocean-600);
+  content: "";
+}
+.store-shell .home-advisor-copy { position: relative; max-width: 720px; }
+.store-shell .home-advisor-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  color: var(--ocean-700);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.store-shell .home-advisor-copy h2 {
+  max-width: 620px;
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(30px, 3.6vw, 46px);
+  font-weight: 720;
+  letter-spacing: -.04em;
+  line-height: 1.08;
+}
+.store-shell .home-advisor-copy p {
+  max-width: 620px;
+  margin: 16px 0 0;
+  color: #4d697a;
+  font-size: 15px;
+  line-height: 1.7;
+}
+.store-shell .home-advisor-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 46px;
+  margin-top: 24px;
+  padding: 0 20px;
+  border-radius: 10px;
+  background: var(--ocean-700);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  transition: background-color .2s ease, transform .2s ease;
+}
+.store-shell .home-advisor-cta:hover { background: var(--ocean-800); color: #fff; transform: translateY(-1px); }
+.store-shell .home-advisor-cta:focus-visible { outline: 3px solid rgba(38, 135, 180, .28); outline-offset: 3px; }
+.store-shell .home-advisor-guide {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  align-self: center;
+  padding-left: 34px;
+  border-left: 1px solid #c5dce7;
+}
+.store-shell .home-advisor-guide-icon {
+  display: grid;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 11px;
+  background: #fff;
+  color: var(--ocean-700);
+  font-size: 18px;
+}
+.store-shell .home-advisor-guide-label {
+  display: block;
+  margin: 1px 0 10px;
+  color: #698293;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.store-shell .home-advisor-guide ul { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.store-shell .home-advisor-guide li { display: flex; align-items: center; gap: 9px; color: var(--ink); font-size: 14px; font-weight: 650; }
+.store-shell .home-advisor-guide li::before { width: 5px; height: 5px; border-radius: 50%; background: var(--ocean-500); content: ""; }
+
+.store-shell .home-seo-intro { padding: 86px 0; background: #fff; }
+.store-shell .home-seo-grid { display: block; max-width: 900px; }
+.store-shell .home-seo-grid h2 { max-width: 720px; margin: 0 0 24px; color: var(--ink); font-size: clamp(32px, 4vw, 50px); }
+.store-shell .home-seo-copy { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+.store-shell .home-seo-grid p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.75; }
+.store-shell .home-seo-grid a { color: var(--ocean-700); }
+
+.store-shell .home-benefits { padding: 34px 0; border-top: 1px solid var(--line); background: #fff; color: var(--ink); }
+.store-shell .benefit-item { padding: 14px 0; }
+.store-shell .benefit-icon { border-radius: 11px; background: var(--ocean-50); color: var(--ocean-700); }
+.store-shell .benefit-item h3 { color: var(--ink); }
+.store-shell .benefit-item p { color: var(--muted); }
+
+@media (max-width: 1180px) {
+  .store-shell .home-product-grid,
+  .store-shell .store-product-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (max-width: 820px) {
+  .store-shell .home-product-grid,
+  .store-shell .store-product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .store-shell .home-advisor-panel { grid-template-columns: 1fr; gap: 32px; padding: 40px; }
+  .store-shell .home-advisor-guide { padding: 26px 0 0; border-top: 1px solid #c5dce7; border-left: 0; }
+  .store-shell .home-seo-copy { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .store-shell .home-hero-dots { bottom: 2px; }
+  .store-shell .home-service-strip { margin-top: 0; }
+  .store-shell .home-service-strip .store-container { width: 100%; border: 0; border-radius: 0; box-shadow: none; }
+  .store-shell .home-section,
+  .store-shell .home-seo-intro { padding-block: 58px; }
+  .store-shell .home-advisor-section { padding-bottom: 58px; }
+  .store-shell .home-advisor-panel { gap: 28px; padding: 32px 24px; border-radius: 12px; }
+  .store-shell .home-advisor-copy h2 { font-size: 30px; }
+  .store-shell .home-advisor-guide { gap: 12px; padding-top: 24px; }
+  .store-shell .home-advisor-guide-icon { flex-basis: 38px; width: 38px; height: 38px; }
+  .store-shell .section-heading { align-items: flex-end; }
+  .store-shell .section-heading h2 { font-size: 32px; }
+  .store-shell .home-product-grid,
+  .store-shell .store-product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+}
