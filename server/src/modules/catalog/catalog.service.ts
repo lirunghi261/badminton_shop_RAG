@@ -38,7 +38,7 @@ export async function listCatalogProducts(
   }
 
   const pipeline: PipelineStage[] = [
-    { $match: { status: { $ne: "deleted" } } },
+    { $match: { status: "active", deletedAt: null } },
     { $sort: { updatedAt: -1, _id: 1 } },
     {
       $lookup: {
@@ -58,6 +58,14 @@ export async function listCatalogProducts(
     },
     { $unwind: { path: "$brand", preserveNullAndEmptyArrays: true } },
     { $unwind: { path: "$category", preserveNullAndEmptyArrays: true } },
+    {
+      $match: {
+        "brand.status": "active",
+        "brand.deletedAt": null,
+        "category.status": "active",
+        "category.deletedAt": null,
+      },
+    },
   ];
 
   if (typeof options.limit === "number") {
@@ -129,6 +137,10 @@ function normalizeCatalogProduct(product: ProductWithLookups): NormalizedCatalog
     id: toId(product._id),
     slug: toStringValue(product.slug),
     name: toStringValue(product.name),
+    brandId: toId(product.brand?._id),
+    brandSlug: toStringValue(product.brand?.slug),
+    categoryId: toId(product.category?._id),
+    categorySlug: toStringValue(product.category?.slug),
     brandName: getLookupName(product.brand),
     categoryName: getLookupName(product.category),
     basePrice,

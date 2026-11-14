@@ -10,7 +10,12 @@ const brandFields = z.object({
 });
 
 export const createBrandSchema = brandFields;
-export const updateBrandSchema = brandFields.partial().refine((value) => Object.keys(value).length > 0, {
+export const updateBrandSchema = brandFields.partial().extend({
+  description: brandFields.shape.description.removeDefault().optional(),
+  logoUrl: brandFields.shape.logoUrl.removeDefault().optional(),
+  status: brandFields.shape.status.removeDefault().optional(),
+  sortOrder: brandFields.shape.sortOrder.removeDefault().optional(),
+}).refine((value) => Object.keys(value).length > 0, {
   message: "Không có dữ liệu cập nhật.",
 });
 export const listBrandsQuerySchema = z.object({

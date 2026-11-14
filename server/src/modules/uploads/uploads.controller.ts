@@ -21,6 +21,18 @@ export async function postCatalogImage(request: Request, response: Response): Pr
     throw new AppError("Vui lòng chọn một file ảnh.", 400, "IMAGE_REQUIRED");
   }
 
+  const { buffer, mimetype } = request.file;
+  const matchesSignature =
+    (mimetype === "image/png" && buffer.length >= 8 &&
+      buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) ||
+    (mimetype === "image/jpeg" && buffer.length >= 3 &&
+      buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) ||
+    (mimetype === "image/webp" && buffer.length >= 12 &&
+      buffer.toString("ascii", 0, 4) === "RIFF" && buffer.toString("ascii", 8, 12) === "WEBP");
+  if (!matchesSignature) {
+    throw new AppError("Nội dung file không đúng định dạng ảnh đã khai báo.", 400, "INVALID_IMAGE_CONTENT");
+  }
+
   const uploadStream = bucket().openUploadStream(
     `${randomUUID()}${extensionByMimeType[request.file.mimetype] ?? ""}`,
     {

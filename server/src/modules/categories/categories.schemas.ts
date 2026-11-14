@@ -33,6 +33,13 @@ export const createCategorySchema = categoryFields.refine(
 
 export const updateCategorySchema = categoryFields
   .partial()
+  .extend({
+    description: categoryFields.shape.description.removeDefault().optional(),
+    imageUrl: categoryFields.shape.imageUrl.removeDefault().optional(),
+    status: categoryFields.shape.status.removeDefault().optional(),
+    sortOrder: categoryFields.shape.sortOrder.removeDefault().optional(),
+    attributes: categoryFields.shape.attributes.removeDefault().optional(),
+  })
   .refine((value) => Object.keys(value).length > 0, { message: "Không có dữ liệu cập nhật." })
   .refine((value) => !value.attributes || uniqueAttributeKeys(value.attributes), {
     message: "Key thông số trong danh mục không được trùng.",

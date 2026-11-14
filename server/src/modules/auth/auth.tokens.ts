@@ -23,7 +23,11 @@ export function createAccessToken(userId: string, role: UserRole): string {
 }
 
 export function createRefreshToken(userId: string, role: UserRole): string {
-  return jwt.sign({ role }, env.JWT_REFRESH_SECRET, { subject: userId, expiresIn: "7d" });
+  return jwt.sign({ role }, env.JWT_REFRESH_SECRET, {
+    subject: userId,
+    expiresIn: "7d",
+    jwtid: crypto.randomUUID(),
+  });
 }
 
 export function verifyAccessToken(token: string): AuthTokenPayload {

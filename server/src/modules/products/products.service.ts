@@ -207,8 +207,22 @@ function availableFacetOptions(
   return ordered.slice(0, 24);
 }
 
+async function publicProductFilter(): Promise<Record<string, unknown>> {
+  const active = { deletedAt: null, status: "active" as const };
+  const [categoryIds, brandIds] = await Promise.all([
+    CategoryModel.distinct("_id", active),
+    BrandModel.distinct("_id", active),
+  ]);
+  return {
+    ...active,
+    category: { $in: categoryIds },
+    brand: { $in: brandIds },
+  };
+}
+
 export async function listPublicProducts(query: ListPublicProductsQuery) {
-  const filter: Record<string, unknown> = { deletedAt: null, status: "active" };
+  const publicFilter = await publicProductFilter();
+  const filter = { ...publicFilter };
   const [category, brand] = await Promise.all([
     query.category === "all"
       ? null
@@ -264,7 +278,7 @@ export async function listPublicProducts(query: ListPublicProductsQuery) {
   const skip = (query.page - 1) * query.limit;
   const activeFilter = { deletedAt: null, status: "active" as const };
   const relevantBrandIds = await ProductModel.distinct("brand", {
-    ...activeFilter,
+    ...publicFilter,
     ...(category ? { category: category._id } : {}),
   });
   const [items, total, categories, brands, facetProducts] = await Promise.all([
@@ -312,7 +326,7 @@ export async function getProduct(id: string) {
 }
 
 export async function getPublicProductBySlug(slug: string) {
-  const product = await ProductModel.findOne({ slug, deletedAt: null, status: "active" })
+  const product = await ProductModel.findOne({ ...await publicProductFilter(), slug })
     .populate("category", "name slug attributes")
     .populate("brand", "name slug")
     .lean();

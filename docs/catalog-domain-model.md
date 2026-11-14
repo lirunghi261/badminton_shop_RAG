@@ -37,6 +37,21 @@ danh mục.
 Sản phẩm được xóa mềm. Danh mục hoặc thương hiệu đang được sản phẩm sử dụng sẽ không thể xóa, nhằm
 tránh document sản phẩm mất tham chiếu.
 
+API công khai và catalog dùng cho RAG chỉ lấy sản phẩm `active`, chưa xóa mềm và có cả danh mục,
+thương hiệu `active`, chưa xóa mềm. Quy tắc áp dụng cả danh sách lẫn URL chi tiết sản phẩm.
+Đổi trạng thái danh mục hoặc thương hiệu sang `inactive` sẽ ẩn sản phẩm liên quan khỏi dữ liệu công khai.
+
+Khi PATCH danh mục/thương hiệu, chỉ các trường có trong request được cập nhật. Trường không gửi
+giữ nguyên giá trị; request rỗng bị từ chối. Giá trị mặc định chỉ được áp dụng khi tạo mới.
+
+## Metadata chuẩn bị cho RAG
+
+Adapter catalog và API `/api/rag/preview` cung cấp `id`, `slug`, `categoryId`, `categorySlug`,
+`categoryName`, `brandId`, `brandSlug`, `brandName`. ID dùng đối chiếu collection; slug dùng cho
+URL và bộ lọc. Tên hiển thị có thể thay đổi mà không thay thế khóa tham chiếu.
+
+Giai đoạn này chỉ chuẩn bị dữ liệu và preview. Embedding, Vector Search và LLM thuộc các tuần tiếp theo.
+
 ## Lưu ảnh
 
 Form danh mục, thương hiệu và sản phẩm cho phép chọn ảnh JPG, PNG hoặc WEBP từ máy tính, tối đa 5 MB

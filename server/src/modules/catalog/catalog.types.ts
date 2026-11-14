@@ -36,6 +36,10 @@ export interface NormalizedCatalogProduct {
   id: string;
   slug: string;
   name: string;
+  brandId: string;
+  brandSlug: string;
+  categoryId: string;
+  categorySlug: string;
   brandName: string | null;
   categoryName: string | null;
   basePrice: number | null;
