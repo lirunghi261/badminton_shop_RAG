@@ -37,6 +37,7 @@ function assertValidId(orderId: string) {
 
 function serializeOrder(order: Order & { _id: Types.ObjectId }) {
   return {
+    source: order.orderCode.startsWith("DH-DEMO-") ? "demo" : order.source ?? "legacy",
     id: order._id.toString(),
     orderCode: order.orderCode,
     userId: order.user?.toString() ?? null,
@@ -87,11 +88,24 @@ function serializeOrder(order: Order & { _id: Types.ObjectId }) {
       changedBy: entry.changedBy?.toString() ?? null,
       changedAt: entry.changedAt,
     })),
-    allowedNextStatuses: STATUS_TRANSITIONS[order.status],
-    allowedNextPaymentStatuses: PAYMENT_TRANSITIONS[order.paymentStatus],
+    allowedNextStatuses: allowedOrderStatuses(order),
+    allowedNextPaymentStatuses: allowedPaymentStatuses(order),
     createdAt: order.createdAt,
     updatedAt: order.updatedAt,
   };
+}
+
+function allowedOrderStatuses(order: Order) {
+  return STATUS_TRANSITIONS[order.status].filter((status) => status !== "completed" || (
+    order.paymentStatus === "paid" || (order.paymentMethod === "cod" && order.paymentStatus !== "refunded")
+  ));
+}
+
+function allowedPaymentStatuses(order: Order) {
+  return PAYMENT_TRANSITIONS[order.paymentStatus].filter((status) => (
+    (status !== "paid" || order.status !== "cancelled") &&
+    (status !== "refunded" || order.status === "cancelled" || order.status === "completed")
+  ));
 }
 
 async function findOrder(orderId: string) {
@@ -122,10 +136,10 @@ export async function listOrders(query: ListOrdersQuery) {
   }
 
   const sortMap: Record<ListOrdersQuery["sort"], Record<string, SortOrder>> = {
-    newest: { createdAt: -1 },
-    oldest: { createdAt: 1 },
-    total_desc: { total: -1 },
-    total_asc: { total: 1 },
+    newest: { createdAt: -1, _id: -1 },
+    oldest: { createdAt: 1, _id: 1 },
+    total_desc: { total: -1, _id: 1 },
+    total_asc: { total: 1, _id: 1 },
   };
   const skip = (query.page - 1) * query.limit;
   const [orders, total] = await Promise.all([
@@ -157,7 +171,7 @@ export async function updateOrderStatus(
 ) {
   const order = await findOrder(orderId);
   if (order.status === nextStatus) return serializeOrder(order);
-  if (!STATUS_TRANSITIONS[order.status].includes(nextStatus)) {
+  if (!allowedOrderStatuses(order).includes(nextStatus)) {
     throw new AppError(
       `Không thể chuyển đơn từ ${order.status} sang ${nextStatus}.`,
       409,
@@ -169,6 +183,7 @@ export async function updateOrderStatus(
   }
 
   const previousStatus = order.status;
+  const previousPaymentStatus = order.paymentStatus;
   order.status = nextStatus;
   if (nextStatus === "cancelled") order.cancellationReason = note;
   order.statusHistory.push({
@@ -192,8 +207,19 @@ export async function updateOrderStatus(
     });
   }
 
-  await order.save();
-  return serializeOrder(order);
+  const updated = await OrderModel.findOneAndUpdate(
+    { _id: order._id, status: previousStatus, paymentStatus: previousPaymentStatus },
+    {
+      $set: { status: order.status, cancellationReason: order.cancellationReason, paymentStatus: order.paymentStatus, paymentPaidAt: order.paymentPaidAt },
+      $push: {
+        statusHistory: order.statusHistory[order.statusHistory.length - 1]!,
+        ...(order.paymentStatus !== previousPaymentStatus ? { paymentHistory: order.paymentHistory[order.paymentHistory.length - 1]! } : {}),
+      },
+    },
+    { returnDocument: "after", runValidators: true },
+  );
+  if (!updated) throw new AppError("Đơn hàng vừa thay đổi. Vui lòng tải lại trước khi cập nhật.", 409, "ORDER_CHANGED");
+  return serializeOrder(updated);
 }
 
 export async function updatePaymentStatus(
@@ -204,7 +230,7 @@ export async function updatePaymentStatus(
 ) {
   const order = await findOrder(orderId);
   if (order.paymentStatus === nextStatus) return serializeOrder(order);
-  if (!PAYMENT_TRANSITIONS[order.paymentStatus].includes(nextStatus)) {
+  if (!allowedPaymentStatuses(order).includes(nextStatus)) {
     throw new AppError(
       `Không thể chuyển thanh toán từ ${order.paymentStatus} sang ${nextStatus}.`,
       409,
@@ -222,13 +248,21 @@ export async function updatePaymentStatus(
     changedBy: new Types.ObjectId(adminId),
     changedAt: new Date(),
   });
-  await order.save();
-  return serializeOrder(order);
+  const updated = await OrderModel.findOneAndUpdate(
+    { _id: order._id, status: order.status, paymentStatus: previousStatus },
+    {
+      $set: { paymentStatus: order.paymentStatus, paymentPaidAt: order.paymentPaidAt },
+      $push: { paymentHistory: order.paymentHistory[order.paymentHistory.length - 1]! },
+    },
+    { returnDocument: "after", runValidators: true },
+  );
+  if (!updated) throw new AppError("Đơn hàng vừa thay đổi. Vui lòng tải lại trước khi cập nhật.", 409, "ORDER_CHANGED");
+  return serializeOrder(updated);
 }
 
 export async function updateOrderAdminNote(orderId: string, adminNote: string) {
   const order = await findOrder(orderId);
-  order.adminNote = adminNote;
-  await order.save();
-  return serializeOrder(order);
+  const updated = await OrderModel.findByIdAndUpdate(order._id, { $set: { adminNote } }, { returnDocument: "after", runValidators: true });
+  if (!updated) throw new AppError("Không tìm thấy đơn hàng.", 404, "ORDER_NOT_FOUND");
+  return serializeOrder(updated);
 }

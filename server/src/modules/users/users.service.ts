@@ -1,8 +1,17 @@
 import bcrypt from "bcryptjs";
-import { Types, type SortOrder } from "mongoose";
+import { Types, type SortOrder, type ClientSession } from "mongoose";
 import { AppError } from "../../utils/AppError.js";
 import { UserModel, type User, type UserRole, type UserStatus } from "./user.model.js";
 import type { CreateUserInput, ListUsersQuery, UpdateUserInput } from "./users.schemas.js";
+import { AdminGuardModel } from "./admin-guard.model.js";
+
+async function withAdminGuard<T>(work: (session: ClientSession) => Promise<T>) {
+  await AdminGuardModel.updateOne({ _id: "active-admins" }, { $setOnInsert: { revision: 0 } }, { upsert: true });
+  return UserModel.db.transaction(async (session) => {
+    await AdminGuardModel.updateOne({ _id: "active-admins" }, { $inc: { revision: 1 } }, { session });
+    return work(session);
+  });
+}
 
 function escapeRegex(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -51,7 +60,7 @@ function duplicateUserError(error: { keyPattern?: Record<string, number> }) {
   return new AppError("Email này đã được sử dụng.", 409, "EMAIL_ALREADY_EXISTS");
 }
 
-async function assertNotRemovingLastAdmin(user: User, nextRole?: UserRole, nextStatus?: UserStatus) {
+async function assertNotRemovingLastAdmin(user: User, session: ClientSession, nextRole?: UserRole, nextStatus?: UserStatus) {
   const removesActiveAdmin =
     user.role === "admin" &&
     user.status === "active" &&
@@ -63,7 +72,7 @@ async function assertNotRemovingLastAdmin(user: User, nextRole?: UserRole, nextS
     role: "admin",
     status: "active",
     deletedAt: null,
-  });
+  }).session(session);
   if (activeAdmins <= 1) {
     throw new AppError(
       "Hệ thống phải còn ít nhất một quản trị viên đang hoạt động.",
@@ -152,8 +161,12 @@ export async function createUser(input: CreateUserInput) {
 }
 
 export async function updateUser(userId: string, currentAdminId: string, input: UpdateUserInput) {
+  return withAdminGuard((session) => updateUserInSession(userId, currentAdminId, input, session));
+}
+
+async function updateUserInSession(userId: string, currentAdminId: string, input: UpdateUserInput, session: ClientSession) {
   assertValidId(userId);
-  const user = await UserModel.findOne({ _id: userId, deletedAt: null }).select("+refreshTokenHash");
+  const user = await UserModel.findOne({ _id: userId, deletedAt: null }).select("+refreshTokenHash").session(session);
   if (!user) throw new AppError("Không tìm thấy người dùng.", 404, "USER_NOT_FOUND");
 
   const isSelf = user.id === currentAdminId;
@@ -165,7 +178,7 @@ export async function updateUser(userId: string, currentAdminId: string, input: 
     );
   }
 
-  await assertNotRemovingLastAdmin(user, input.role, input.status);
+  await assertNotRemovingLastAdmin(user, session, input.role, input.status);
 
   if (input.name !== undefined) user.name = input.name;
   if (input.email !== undefined) user.email = input.email;
@@ -175,7 +188,7 @@ export async function updateUser(userId: string, currentAdminId: string, input: 
   if (input.status === "blocked" || input.role === "customer") user.refreshTokenHash = null;
 
   try {
-    await user.save();
+    await user.save({ session });
     return serializeUser(user);
   } catch (error) {
     if (isDuplicateKeyError(error)) {
@@ -194,17 +207,21 @@ export async function updateUserStatus(
 }
 
 export async function deleteUser(userId: string, currentAdminId: string) {
+  return withAdminGuard((session) => deleteUserInSession(userId, currentAdminId, session));
+}
+
+async function deleteUserInSession(userId: string, currentAdminId: string, session: ClientSession) {
   assertValidId(userId);
   if (userId === currentAdminId) {
     throw new AppError("Bạn không thể xóa tài khoản đang đăng nhập.", 409, "SELF_PROTECTION");
   }
 
-  const user = await UserModel.findOne({ _id: userId, deletedAt: null }).select("+refreshTokenHash");
+  const user = await UserModel.findOne({ _id: userId, deletedAt: null }).select("+refreshTokenHash").session(session);
   if (!user) throw new AppError("Không tìm thấy người dùng.", 404, "USER_NOT_FOUND");
-  await assertNotRemovingLastAdmin(user, "customer", "blocked");
+  await assertNotRemovingLastAdmin(user, session, "customer", "blocked");
 
   user.status = "blocked";
   user.deletedAt = new Date();
   user.refreshTokenHash = null;
-  await user.save();
+  await user.save({ session });
 }

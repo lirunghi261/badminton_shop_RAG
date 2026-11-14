@@ -45,7 +45,7 @@ export function DashboardPage() {
             <MetricCard title="Sản phẩm" value={summaryQuery.data?.products ?? 0} icon={<AppstoreOutlined />} />
           </Col>
           <Col xs={24} sm={12} xl={6}>
-            <MetricCard title="Đơn hàng" value={summaryQuery.data?.orders ?? 0} icon={<ShoppingCartOutlined />} />
+            <MetricCard title="Đơn hàng (không gồm mẫu)" value={summaryQuery.data?.orders ?? 0} icon={<ShoppingCartOutlined />} />
           </Col>
           <Col xs={24} sm={12} xl={6}>
             <MetricCard title="Khách hàng" value={summaryQuery.data?.customers ?? 0} icon={<TeamOutlined />} />
@@ -56,12 +56,12 @@ export function DashboardPage() {
           <Col span={24}>
             <Card className="revenue-card">
               <Statistic
-                title="Doanh thu đơn đã thanh toán"
+                title="Doanh thu đơn hoàn tất và đã thanh toán"
                 value={summaryQuery.data?.revenue ?? 0}
                 formatter={(value) => currency.format(Number(value))}
                 prefix={<DollarOutlined />}
               />
-              <span className="revenue-note"><ArrowUpOutlined /> Dữ liệu sẽ cập nhật theo đơn hàng thực tế</span>
+              <span className="revenue-note"><ArrowUpOutlined /> Không tính đơn dữ liệu mẫu; đơn hoàn tiền được loại khỏi doanh thu.</span>
             </Card>
           </Col>
         </Row>

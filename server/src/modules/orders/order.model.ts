@@ -58,6 +58,7 @@ export interface OrderPaymentHistoryEntry {
 }
 
 export interface Order {
+  source?: "demo" | "checkout" | "legacy";
   orderCode: string;
   user?: Types.ObjectId | null;
   customer: OrderCustomer;
@@ -140,6 +141,7 @@ const paymentHistorySchema = new Schema<OrderPaymentHistoryEntry>(
 
 const orderSchema = new Schema<Order, OrderModel>(
   {
+    source: { type: String, enum: ["demo", "checkout", "legacy"], default: "legacy", index: true },
     orderCode: { type: String, required: true, unique: true, trim: true, uppercase: true },
     user: { type: Schema.Types.ObjectId, ref: "User", default: null, index: true },
     customer: { type: customerSchema, required: true },

@@ -11,6 +11,8 @@ export const listOrdersQuerySchema = z.object({
   dateFrom: z.iso.date().optional(),
   dateTo: z.iso.date().optional(),
   sort: z.enum(["newest", "oldest", "total_desc", "total_asc"]).default("newest"),
+}).refine((value) => !value.dateFrom || !value.dateTo || value.dateFrom <= value.dateTo, {
+  message: "Ngày bắt đầu phải trước hoặc bằng ngày kết thúc.", path: ["dateTo"],
 });
 
 export const updateOrderStatusSchema = z.object({

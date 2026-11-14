@@ -45,6 +45,7 @@ export interface OrderHistoryEntry<TStatus> {
 }
 
 export interface ManagedOrder {
+  source: "demo" | "checkout" | "legacy";
   id: string;
   orderCode: string;
   userId: string | null;

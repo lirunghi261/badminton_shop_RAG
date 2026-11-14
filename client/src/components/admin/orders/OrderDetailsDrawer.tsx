@@ -172,6 +172,7 @@ export function OrderDetailsDrawer({ orderId, onClose }: OrderDetailsDrawerProps
       title={order ? (
         <Space wrap>
           <span>{order.orderCode}</span>
+          {order.source === "demo" && <Typography.Text type="secondary">Dữ liệu mẫu</Typography.Text>}
           <OrderStatusTag status={order.status} />
         </Space>
       ) : "Chi tiết đơn hàng"}

@@ -9,7 +9,7 @@ export async function getDashboardSummary(_request: Request, response: Response)
 
   const [products, orders, customers, lowStock, revenueResult] = await Promise.all([
     database.collection("products").countDocuments({ deletedAt: null }),
-    database.collection("orders").countDocuments({}),
+    database.collection("orders").countDocuments({ source: { $ne: "demo" }, orderCode: { $not: /^DH-DEMO-/ } }),
     database.collection("users").countDocuments({ role: "customer", deletedAt: null }),
     database
       .collection("products")
@@ -23,7 +23,7 @@ export async function getDashboardSummary(_request: Request, response: Response)
     database
       .collection("orders")
       .aggregate<{ total: number }>([
-        { $match: { status: "completed", paymentStatus: "paid" } },
+        { $match: { status: "completed", paymentStatus: "paid", source: { $ne: "demo" }, orderCode: { $not: /^DH-DEMO-/ } } },
         { $group: { _id: null, total: { $sum: "$total" } } },
       ])
       .toArray(),

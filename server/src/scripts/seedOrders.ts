@@ -87,6 +87,7 @@ async function seedOrders() {
     const result = await OrderModel.updateOne(
       { orderCode },
       {
+        $set: { source: "demo" },
         $setOnInsert: {
           orderCode,
           user: customerUsers[index % Math.max(customerUsers.length, 1)]?._id ?? null,

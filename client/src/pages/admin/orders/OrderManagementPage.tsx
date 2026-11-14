@@ -66,6 +66,7 @@ export function OrderManagementPage() {
       render: (_, order) => (
         <span className="order-code-cell">
           <Typography.Text strong>{order.orderCode}</Typography.Text>
+          {order.source === "demo" && <Typography.Text type="secondary">Dữ liệu mẫu</Typography.Text>}
           <Typography.Text type="secondary">{dateTime.format(new Date(order.createdAt))}</Typography.Text>
         </span>
       ),
