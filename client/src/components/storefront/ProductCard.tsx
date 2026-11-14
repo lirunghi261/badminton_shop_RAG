@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import type { StorefrontProduct } from "../../api/storefront/products.api";
 import { paths } from "../../routes/paths";
-import { formatCurrency, getPrimaryImage, getStartingPrice, getVariantPricing } from "./productPresentation";
+import { formatCurrency, getPrimaryImage, getStartingPricing } from "./productPresentation";
 
 interface ProductCardProps {
   product: StorefrontProduct;
@@ -13,13 +13,9 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const image = getPrimaryImage(product.images);
   const [imageFailed, setImageFailed] = useState(false);
-  const startingPrice = getStartingPrice(product);
-  const variantPrices = product.variants.map((variant) => getVariantPricing(product, variant));
-  const regularPrice = variantPrices.reduce<number | null>((lowest, price) => {
-    if (price.salePrice == null) return lowest;
-    return lowest == null ? price.regularPrice : Math.min(lowest, price.regularPrice);
-  }, product.salePrice != null && product.salePrice < product.basePrice ? product.basePrice : null);
-  const hasSale = regularPrice != null && regularPrice > startingPrice;
+  const { salePrice, regularPrice } = getStartingPricing(product);
+  const startingPrice = salePrice ?? regularPrice;
+  const hasSale = salePrice !== null;
   const lowStock = product.totalStock > 0 && product.totalStock <= 5;
 
   return (

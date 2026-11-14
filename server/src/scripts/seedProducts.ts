@@ -4,6 +4,8 @@ import { connectDatabase, disconnectDatabase } from "../config/database.js";
 import { BrandModel } from "../modules/brands/brand.model.js";
 import { CategoryModel } from "../modules/categories/category.model.js";
 import { ProductModel, type ProductSpecification } from "../modules/products/product.model.js";
+import { createProductSchema } from "../modules/products/products.schemas.js";
+import { createProduct } from "../modules/products/products.service.js";
 import { sanitizeRichText } from "../utils/sanitizeRichText.js";
 
 type SeedAttribute = { key: string; label: string; value: string };
@@ -73,6 +75,45 @@ const simpleVariant = (sku: string, colorName: string, stock: number, colorHex =
   imageIndex,
   attributes: [],
 });
+
+const week05Products: SeedProduct[] = [
+  {
+    name: "Ống cầu lông Yonex Aerosensa 30",
+    slug: "ong-cau-long-yonex-as30",
+    sourcePage: source("ong-cau-long-yonex-as30.html"),
+    categorySlug: "phu-kien-cau-long",
+    brandSlug: "yonex",
+    shortDescription: "Ống cầu lông vũ Yonex Aerosensa 30, quy cách 12 quả.",
+    basePrice: 1239000,
+    images: [image("https://shopvnb.com/uploads/san_pham/ong-cau-long-yonex-as30-1.webp", "Ống cầu Yonex Aerosensa 30")],
+    specifications: [spec("accessoryType", "Loại phụ kiện", "Ống cầu lông vũ")],
+    variants: [simpleVariant("YX-AS30-TUBE12", "Ống 12 quả", 0)],
+  },
+  {
+    name: "Ống cầu lông nhựa Yonex Mavis 350 vàng",
+    slug: "ong-cau-long-nhua-yonex-mav-350-6-in-1-vang",
+    sourcePage: source("ong-cau-long-nhua-yonex-mav-350-6-in-1-vang.html"),
+    categorySlug: "phu-kien-cau-long",
+    brandSlug: "yonex",
+    shortDescription: "Ống cầu lông nhựa Yonex Mavis 350 màu vàng, quy cách 6 quả.",
+    basePrice: 389000,
+    images: [image("https://shopvnb.com/uploads/san_pham/ong-cau-long-nhua-yonex-mav-350-6-in-1-vang-1.webp", "Ống cầu Yonex Mavis 350 vàng")],
+    specifications: [spec("accessoryType", "Loại phụ kiện", "Ống cầu lông nhựa")],
+    variants: [simpleVariant("YX-MAVIS350-YEL-6", "Vàng", 0)],
+  },
+  {
+    name: "Quấn cán Yonex AC102EX",
+    slug: "quan-can-yonex-ac102ex-cai",
+    sourcePage: source("quan-can-yonex-xin-ac102ex-cai-.html"),
+    categorySlug: "phu-kien-cau-long",
+    brandSlug: "yonex",
+    shortDescription: "Quấn cán vợt Yonex AC102EX bán theo chiếc.",
+    basePrice: 40000,
+    images: [image("https://shopvnb.com/uploads/san_pham/quan-can-yonex-xin-ac102ex-cai--1.webp", "Quấn cán Yonex AC102EX")],
+    specifications: [spec("accessoryType", "Loại phụ kiện", "Quấn cán vợt")],
+    variants: [simpleVariant("YX-AC102EX-SINGLE", "Màu tiêu chuẩn", 10)],
+  },
+];
 
 const products: SeedProduct[] = [
   {
@@ -487,7 +528,8 @@ async function seedProducts() {
   let skipped = 0;
   const failures: string[] = [];
 
-  for (const product of products) {
+  const selectedProducts = process.argv.includes("--week-05") ? week05Products : [...products, ...week05Products];
+  for (const product of selectedProducts) {
     if (await ProductModel.exists({ slug: product.slug })) {
       skipped += 1;
       console.log(`Skip: ${product.name}`);
@@ -513,14 +555,14 @@ async function seedProducts() {
           sortOrder: index,
         });
       }
-      await ProductModel.create({
+      const payload = {
         name: product.name,
         slug: product.slug,
         category,
         brand,
         shortDescription: product.shortDescription,
         description: richDescription(product),
-        status: "active",
+        status: "active" as const,
         basePrice: product.basePrice,
         salePrice: product.salePrice ?? null,
         images: uploadedImages,
@@ -532,7 +574,12 @@ async function seedProducts() {
           imageUrl: uploadedImages[imageIndex]?.url ?? uploadedImages[0]?.url ?? "",
         })),
         deletedAt: null,
-      });
+      };
+      if (week05Products.includes(product)) {
+        await createProduct(createProductSchema.parse({ ...payload, categoryId: category.toString(), brandId: brand.toString() }));
+      } else {
+        await ProductModel.create(payload);
+      }
       inserted += 1;
       console.log(`Added: ${product.name}`);
     } catch (error) {
@@ -545,7 +592,7 @@ async function seedProducts() {
     }
   }
 
-  const total = await ProductModel.countDocuments({ deletedAt: null });
+  const total = await ProductModel.countDocuments({ deletedAt: null, status: "active" });
   console.log(`Products ready: ${inserted} added, ${skipped} skipped, ${total} active records in database.`);
   if (failures.length) {
     console.error(`Failed (${failures.length}):\n- ${failures.join("\n- ")}`);

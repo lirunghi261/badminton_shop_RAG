@@ -142,6 +142,42 @@ try {
     r=await a.request('POST','/api/admin/uploads/catalog-image',form(bytes,mime,filename));check('W04 valid '+mime+' upload',r.status===201);
     if(r.data.data?.image?.url){const image=await anon.request('GET',r.data.data.image.url);check('W04 '+mime+' byte roundtrip',image.status===200&&image.data.equals(bytes));}
   }
+  const testCategory = await CategoryModel.create({name:'Week Five',slug:'week-five',attributes:[{key:'material',label:'Material',dataType:'text',scope:'specification'}]});
+  const draft = {
+    name:'Week Five Product', categoryId:testCategory.id, brandId:brand.id, status:'active',
+    basePrice:100000, salePrice:90000, shortDescription:'Keep this summary',
+    description:'<h2>Keep this description</h2><iframe title="Unsupported content"></iframe>',
+    images:[{url:'https://example.invalid/front.png',isPrimary:true},{url:'https://example.invalid/back.png'}],
+    specifications:[{key:'material',label:'Material',value:'Nylon'}],
+    variants:[{sku:'week-five-red',colorName:'Red',price:65000,salePrice:50000,stock:4},{sku:'week-five-blue',colorName:'Blue',price:120000,salePrice:0,stock:0}],
+  };
+  const productRoute = '/api/admin/products';
+  r = await a.request('POST',productRoute,draft);
+  check('W05 product created with rich text and gallery',r.status===201&&r.data.data.product.description==='<h2>Keep this description</h2>'&&r.data.data.product.images.length===2);
+  const created = r.data.data.product;
+  const editRoute = `${productRoute}/${created._id}`;
+  r = await a.request('PATCH',editRoute,{basePrice:110000});
+  const edited = r.data.data?.product;
+  check('W05 changing only price preserves existing product data',r.status===200&&edited.basePrice===110000&&edited.status==='active'&&edited.shortDescription===draft.shortDescription&&edited.description===created.description&&edited.specifications[0].value==='Nylon'&&edited.images.length===2&&edited.variants.length===2);
+  for (const [name,payload] of [
+    ['empty patch',{}],['invalid combined price',{basePrice:85000}],
+    ['negative inventory',{variants:[{...draft.variants[0],stock:-1}]}],
+    ['duplicate SKU in product',{variants:[draft.variants[0],{...draft.variants[1],sku:'WEEK-FIVE-RED'}]}],
+    ['invalid SKU discount',{variants:[{...draft.variants[0],salePrice:70000}]}],
+    ['missing primary image',{images:[{url:'https://example.invalid/photo.png'}]}],
+  ]) {
+    r = await a.request('PATCH',editRoute,payload);
+    check(`W05 rejects ${name}`,r.status===400);
+  }
+  r = await a.request('POST',productRoute,{...draft,name:'Week Five Duplicate'});
+  check('W05 rejects SKU used by another product',r.status===409);
+  const afterRejected = await a.request('GET',editRoute);
+  check('W05 rejected changes preserve the saved product',afterRejected.status===200&&afterRejected.data.data.product.basePrice===110000&&afterRejected.data.data.product.variants.length===2);
+  const exported = (await listCatalogProducts()).find(item=>item.id===created._id);
+  check('W05 catalog preview uses SKU prices and stock, including zero',exported?.effectivePrice===0&&exported.variants[0].effectivePrice===50000&&exported.variants[1].stock===0&&exported.totalStock===4);
+  r = await a.request('DELETE',editRoute);
+  const removed = await anon.request('GET',`/api/products/${created.slug}`);
+  check('W05 deleted product is hidden from storefront',r.status===200&&removed.status===404);
   const refreshBeforeLogout=a.cookies.get('refreshToken');r=await a.request('POST','/api/auth/logout');check('W03 logout clears cookies',r.status===200&&!a.cookies.has('accessToken')&&!a.cookies.has('refreshToken'));
   r=await a.request('GET','/api/auth/me');check('W03 logged-out session denied',r.status===401);
   const afterLogout=new Session();afterLogout.cookies.set('refreshToken',refreshBeforeLogout);r=await afterLogout.request('POST','/api/auth/refresh');check('W03 refresh revoked on logout',r.status===401);

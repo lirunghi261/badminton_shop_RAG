@@ -21,6 +21,7 @@ export interface CatalogVariant {
   attributes: CatalogVariantAttribute[];
   price: number | null;
   salePrice: number | null;
+  effectivePrice: number | null;
   stock: number;
   imageUrl: string;
 }

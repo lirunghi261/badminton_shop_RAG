@@ -110,7 +110,7 @@ export function buildRagText(product: NormalizedCatalogProduct): string {
           .map((attribute) => `${attribute.label}: ${formatPrimitive(attribute.value)}`)
           .join(", ");
         const details = attributes ? `; ${attributes}` : "";
-        return `- SKU ${variant.sku}: màu ${variant.colorName || "Chưa có dữ liệu"}; tồn kho ${variant.stock}${details}`;
+        return `- SKU ${variant.sku}: màu ${variant.colorName || "Chưa có dữ liệu"}; giá bán ${formatPrice(variant.effectivePrice)}; tồn kho ${variant.stock}${details}`;
       }),
     );
   }
@@ -126,11 +126,16 @@ export function buildRagText(product: NormalizedCatalogProduct): string {
   return lines.join("\n");
 }
 
+function resolveEffectivePrice(regular: number | null, sale: number | null) {
+  return regular !== null && sale !== null && sale < regular ? sale : regular;
+}
+
 function normalizeCatalogProduct(product: ProductWithLookups): NormalizedCatalogProduct {
   const basePrice = toNullableNumber(product.basePrice);
   const salePrice = toNullableNumber(product.salePrice);
-  const effectivePrice = salePrice !== null && salePrice > 0 ? salePrice : basePrice;
-  const variants = normalizeVariants(product.variants);
+  const variants = normalizeVariants(product.variants, basePrice, salePrice);
+  const skuPrices = variants.flatMap((variant) => variant.effectivePrice === null ? [] : [variant.effectivePrice]);
+  const effectivePrice = skuPrices.length ? Math.min(...skuPrices) : resolveEffectivePrice(basePrice, salePrice);
   const images = normalizeImages(product.images);
 
   return {
@@ -172,21 +177,24 @@ function normalizeSpecifications(value: unknown): CatalogSpecification[] {
   });
 }
 
-function normalizeVariants(value: unknown): CatalogVariant[] {
+function normalizeVariants(value: unknown, basePrice: number | null, productSalePrice: number | null): CatalogVariant[] {
   if (!Array.isArray(value)) {
     return [];
   }
 
   return value.map((item) => {
     const variant = toObject(item);
+    const price = toNullableNumber(variant.price);
+    const salePrice = toNullableNumber(variant.salePrice);
     return {
       id: toId(variant._id),
       sku: toStringValue(variant.sku),
       colorName: toStringValue(variant.colorName),
       colorHex: toStringValue(variant.colorHex),
       attributes: normalizeVariantAttributes(variant.attributes),
-      price: toNullableNumber(variant.price),
-      salePrice: toNullableNumber(variant.salePrice),
+      price,
+      salePrice,
+      effectivePrice: resolveEffectivePrice(price ?? basePrice, salePrice ?? productSalePrice),
       stock: toNumber(variant.stock),
       imageUrl: toStringValue(variant.imageUrl),
     };

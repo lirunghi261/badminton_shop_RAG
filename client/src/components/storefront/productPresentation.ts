@@ -23,7 +23,15 @@ export function getVariantName(variant: StorefrontProductVariant) {
   return [variant.colorName, ...attributes].filter(Boolean).join(" · ");
 }
 
+export function getStartingPricing(product: StorefrontProduct) {
+  const prices = product.variants.map((variant) => getVariantPricing(product, variant));
+  return prices.reduce<ReturnType<typeof getVariantPricing> | undefined>((lowest, price) => {
+    if (!lowest || (price.salePrice ?? price.regularPrice) < (lowest.salePrice ?? lowest.regularPrice)) return price;
+    return lowest;
+  }, undefined) ?? getVariantPricing(product);
+}
+
 export function getStartingPrice(product: StorefrontProduct) {
-  const prices = product.variants.map((variant) => getVariantPricing(product, variant).salePrice ?? getVariantPricing(product, variant).regularPrice);
-  return Math.min(product.salePrice ?? product.basePrice, ...prices);
+  const { salePrice, regularPrice } = getStartingPricing(product);
+  return salePrice ?? regularPrice;
 }

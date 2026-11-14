@@ -64,6 +64,12 @@ export const createProductSchema = productFields.refine(validPrices, {
 });
 export const updateProductSchema = productFields
   .partial()
+  .extend({
+    shortDescription: productFields.shape.shortDescription.removeDefault().optional(),
+    description: productFields.shape.description.removeDefault().optional(),
+    status: productFields.shape.status.removeDefault().optional(),
+    specifications: productFields.shape.specifications.removeDefault().optional(),
+  })
   .refine((value) => Object.keys(value).length > 0, { message: "Không có dữ liệu cập nhật." })
   .refine(validPrices, { message: "Giá khuyến mãi không được lớn hơn giá bán.", path: ["salePrice"] });
 

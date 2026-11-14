@@ -19,7 +19,7 @@ function ProductDetailLoading() {
 }
 
 function ProductDetailContent({ product }: { product: StorefrontProduct }) {
-  const [selectedImage, setSelectedImage] = useState(0);
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string>();
   const [selectedSku, setSelectedSku] = useState<string | undefined>();
   const [quantity, setQuantity] = useState(1);
   const [imageFailed, setImageFailed] = useState(false);
@@ -28,10 +28,13 @@ function ProductDetailContent({ product }: { product: StorefrontProduct }) {
   const navigate = useNavigate();
 
   const images = useMemo(() => [...product.images].sort((first, second) => first.sortOrder - second.sortOrder), [product.images]);
-  const activeImage = images[selectedImage] ?? getPrimaryImage(product.images);
   const selectedVariant = product.variants.find((variant) => variant.sku === selectedSku)
     ?? product.variants.find((variant) => variant.stock > 0)
     ?? product.variants[0];
+  const preferredImage = selectedImageUrl ?? selectedVariant?.imageUrl;
+  const activeImage = preferredImage
+    ? images.find((image) => image.url === preferredImage) ?? { url: preferredImage, alt: product.name }
+    : getPrimaryImage(images);
   const pricing = getVariantPricing(product, selectedVariant);
 
   const isInStock = (selectedVariant?.stock ?? product.totalStock) > 0;
@@ -70,12 +73,12 @@ function ProductDetailContent({ product }: { product: StorefrontProduct }) {
                 <div className="store-product-thumbnails">
                   {images.map((image, index) => (
                     <button
-                      className={index === selectedImage ? "active" : ""}
+                      className={image.url === activeImage?.url ? "active" : ""}
                       type="button"
                       key={`${image.url}-${index}`}
-                      onClick={() => { setSelectedImage(index); setImageFailed(false); }}
+                      onClick={() => { setSelectedImageUrl(image.url); setImageFailed(false); }}
                       aria-label={`Xem ảnh ${index + 1} của ${product.name}`}
-                      aria-pressed={index === selectedImage}
+                      aria-pressed={image.url === activeImage?.url}
                     >
                       <img src={image.url} alt="" />
                     </button>
@@ -92,7 +95,7 @@ function ProductDetailContent({ product }: { product: StorefrontProduct }) {
               <p className="store-product-short-description">{product.shortDescription}</p>
               <div className="store-product-detail-price">
                 <strong>{formatCurrency(pricing.salePrice ?? pricing.regularPrice)}</strong>
-                {pricing.salePrice && <del>{formatCurrency(pricing.regularPrice)}</del>}
+                {pricing.salePrice !== null && <del>{formatCurrency(pricing.regularPrice)}</del>}
               </div>
               <Tag className={isInStock ? "store-stock-tag available" : "store-stock-tag unavailable"} icon={<CheckCircleFilled />}>
                 {isInStock ? "Còn hàng" : "Tạm hết hàng"}
@@ -107,7 +110,12 @@ function ProductDetailContent({ product }: { product: StorefrontProduct }) {
                         type="button"
                         key={variant.sku}
                         disabled={variant.stock <= 0}
-                        onClick={() => { setSelectedSku(variant.sku); setQuantity(1); }}
+                        onClick={() => {
+                          setSelectedSku(variant.sku);
+                          setSelectedImageUrl(undefined);
+                          setImageFailed(false);
+                          setQuantity(1);
+                        }}
                         className={selectedVariant?.sku === variant.sku ? "active" : ""}
                         aria-pressed={selectedVariant?.sku === variant.sku}
                         aria-label={`${getVariantName(variant)} - ${variant.stock > 0 ? `còn ${variant.stock} sản phẩm` : "tạm hết hàng"}`}
