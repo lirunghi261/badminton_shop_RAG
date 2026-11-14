@@ -1,5 +1,6 @@
 import { ArrowLeftOutlined, CheckCircleFilled, PictureOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 import { App, Button, Card, Col, Result, Row, Skeleton, Tag } from "antd";
 import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -171,6 +172,15 @@ export function ProductDetailPage() {
   });
 
   if (productQuery.isPending) return <ProductDetailLoading />;
+
+  if (productQuery.isError && (!isAxiosError(productQuery.error) || productQuery.error.response?.status !== 404)) {
+    return <section className="store-product-detail"><div className="store-container"><Result
+      status="error"
+      title="Chưa tải được sản phẩm"
+      subTitle="Vui lòng kiểm tra kết nối và thử lại."
+      extra={<Button type="primary" loading={productQuery.isFetching} onClick={() => void productQuery.refetch()}>Thử lại</Button>}
+    /></div></section>;
+  }
 
   if (productQuery.isError || !productQuery.data) {
     return (

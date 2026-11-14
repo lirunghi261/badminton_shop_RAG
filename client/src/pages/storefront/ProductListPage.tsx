@@ -186,7 +186,7 @@ export function ProductListPage() {
     const next = new URLSearchParams(searchParams);
     if (!value || value === "all" || (key === "sort" && value === "newest")) next.delete(key);
     else next.set(key, value);
-    next.delete("page");
+    if (key !== "page") next.delete("page");
     if (key === "category") next.delete("facet");
     setSearchParams(next);
   };

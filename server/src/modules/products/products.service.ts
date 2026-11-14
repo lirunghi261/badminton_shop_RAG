@@ -220,6 +220,23 @@ async function publicProductFilter(): Promise<Record<string, unknown>> {
   };
 }
 
+// Same starting price as the storefront: the lowest effective SKU price,
+// including inherited product discounts and a valid zero sale price.
+const startingPriceExpression = {
+  $cond: [
+    { $gt: [{ $size: "$variants" }, 0] },
+    { $min: { $map: {
+      input: "$variants",
+      as: "variant",
+      in: { $min: [
+        { $ifNull: ["$$variant.price", "$basePrice"] },
+        { $ifNull: ["$$variant.salePrice", { $ifNull: ["$salePrice", { $ifNull: ["$$variant.price", "$basePrice"] }] }] },
+      ] },
+    } } },
+    { $ifNull: ["$salePrice", "$basePrice"] },
+  ],
+};
+
 export async function listPublicProducts(query: ListPublicProductsQuery) {
   const publicFilter = await publicProductFilter();
   const filter = { ...publicFilter };
@@ -246,10 +263,10 @@ export async function listPublicProducts(query: ListPublicProductsQuery) {
     filter.$or = [{ name: regex }, { "variants.sku": regex }];
   }
   if (query.minPrice != null || query.maxPrice != null) {
-    filter.basePrice = {
-      ...(query.minPrice != null ? { $gte: query.minPrice } : {}),
-      ...(query.maxPrice != null ? { $lte: query.maxPrice } : {}),
-    };
+    filter.$expr = { $and: [
+      ...(query.minPrice != null ? [{ $gte: [startingPriceExpression, query.minPrice] }] : []),
+      ...(query.maxPrice != null ? [{ $lte: [startingPriceExpression, query.maxPrice] }] : []),
+    ] };
   }
 
   const baseAndFilters: Record<string, unknown>[] = [];
@@ -260,21 +277,27 @@ export async function listPublicProducts(query: ListPublicProductsQuery) {
   const facetDefinitions = category?.attributes.filter((item) => item.filterable) ?? [];
   const facetSelections = parsePublicFacets(query.facets, facetDefinitions);
   const definitionMap = new Map(facetDefinitions.map((item) => [`${item.scope}:${item.key}`, item]));
-  const selectedFacetFilters = facetSelections.map((selection) => {
+  const selectedFacetFilters: Record<string, unknown>[] = facetSelections.filter((selection) => selection.scope === "specification").map((selection) => {
     const definition = definitionMap.get(`${selection.scope}:${selection.key}`)!;
     const values = selection.values.map((value) => facetValue(value, definition));
-    return selection.scope === "specification"
-      ? { specifications: { $elemMatch: { key: selection.key, value: { $in: values } } } }
-      : { variants: { $elemMatch: { attributes: { $elemMatch: { key: selection.key, value: { $in: values } } } } } };
+    return { specifications: { $elemMatch: { key: selection.key, value: { $in: values } } } };
   });
+  const variantSelections = facetSelections.filter((selection) => selection.scope === "variant");
+  if (variantSelections.length) selectedFacetFilters.push({ variants: { $elemMatch: {
+    ...(query.inStock ? { stock: { $gt: 0 } } : {}),
+    $and: variantSelections.map((selection) => ({ attributes: { $elemMatch: {
+      key: selection.key,
+      value: { $in: selection.values.map((value) => facetValue(value, definitionMap.get(`variant:${selection.key}`)!)) },
+    } } })),
+  } } });
   const allAndFilters = [...baseAndFilters, ...selectedFacetFilters];
   if (allAndFilters.length) filter.$and = allAndFilters;
 
   const sort: Record<string, 1 | -1> = query.sort === "price-asc"
-    ? { basePrice: 1 }
+    ? { startingPrice: 1, _id: 1 }
     : query.sort === "price-desc"
-      ? { basePrice: -1 }
-      : { createdAt: -1 };
+      ? { startingPrice: -1, _id: 1 }
+      : { createdAt: -1, _id: -1 };
   const skip = (query.page - 1) * query.limit;
   const activeFilter = { deletedAt: null, status: "active" as const };
   const relevantBrandIds = await ProductModel.distinct("brand", {
@@ -282,13 +305,16 @@ export async function listPublicProducts(query: ListPublicProductsQuery) {
     ...(category ? { category: category._id } : {}),
   });
   const [items, total, categories, brands, facetProducts] = await Promise.all([
-    ProductModel.find(filter)
-      .populate("category", "name slug")
-      .populate("brand", "name slug")
-      .sort(sort)
-      .skip(skip)
-      .limit(query.limit)
-      .lean(),
+    ProductModel.aggregate([
+      { $match: filter },
+      { $addFields: { startingPrice: startingPriceExpression } },
+      { $sort: sort },
+      { $skip: skip },
+      { $limit: query.limit },
+    ]).then((products) => ProductModel.populate(products, [
+      { path: "category", select: "name slug" },
+      { path: "brand", select: "name slug" },
+    ])),
     ProductModel.countDocuments(filter),
     CategoryModel.find(activeFilter, "name slug").sort({ sortOrder: 1, name: 1 }).lean(),
     BrandModel.find({ ...activeFilter, _id: { $in: relevantBrandIds } }, "name slug").sort({ sortOrder: 1, name: 1 }).lean(),

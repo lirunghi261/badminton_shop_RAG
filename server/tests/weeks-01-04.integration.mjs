@@ -178,6 +178,53 @@ try {
   r = await a.request('DELETE',editRoute);
   const removed = await anon.request('GET',`/api/products/${created.slug}`);
   check('W05 deleted product is hidden from storefront',r.status===200&&removed.status===404);
+  // Week 6 public discovery regressions run in the same isolated database.
+  const discoveryCategory = await CategoryModel.create({name:'Discovery',slug:'discovery',status:'active',attributes:[
+    {key:'size',label:'Size',scope:'variant',dataType:'select',options:['S','M'],filterable:true},
+    {key:'weight',label:'Weight',scope:'variant',dataType:'select',options:['3U','4U'],filterable:true},
+  ]});
+  const discovery = (name,basePrice,variants,extra={}) => ({...makeProduct(name),category:discoveryCategory._id,basePrice,variants,...extra});
+  const variant = (sku,price,salePrice,stock=2,attributes=[]) => ({sku,colorName:sku,price,salePrice,stock,attributes});
+  await ProductModel.create([
+    discovery('discover-a',900000,[variant('D-A1',400000,120000),variant('D-A2',700000,null)]),
+    discovery('discover-b',100000,[variant('D-B1',300000,null)]),
+    discovery('discover-c',500000,[variant('D-C1',600000,0,0)]),
+    discovery('discover-d',800000,[variant('D-D1',null,null)],{salePrice:200000}),
+    discovery('discover-e',800000,[variant('D-E1',100000,null)],{salePrice:200000}),
+    discovery('discover-f',800000,[
+      variant('D-F1',100000,null,0,[{key:'size',label:'Size',value:'S'},{key:'weight',label:'Weight',value:'3U'}]),
+      variant('D-F2',100000,null,2,[{key:'size',label:'Size',value:'M'},{key:'weight',label:'Weight',value:'4U'}]),
+    ]),
+    discovery('discover-hidden',1000,[variant('D-HIDDEN',1000,null)],{status:'inactive'}),
+  ]);
+  const discover = async (params={}) => anon.request('GET','/api/products?'+new URLSearchParams({category:'discovery',limit:'48',...params}));
+  const slugs = response => response.data.data.products.map(item=>item.slug);
+  r=await discover({sort:'price-asc'});
+  check('W06 effective SKU price sorting including zero and inherited discount',r.status===200&&slugs(r).join(',')==='discover-c,discover-e,discover-f,discover-a,discover-d,discover-b');
+  r=await discover({minPrice:'110000',maxPrice:'150000'});
+  check('W06 budget uses displayed starting price rather than base price',r.status===200&&slugs(r).join(',')==='discover-a');
+  r=await discover({maxPrice:'0'});
+  check('W06 zero discount remains searchable',r.status===200&&slugs(r).join(',')==='discover-c');
+  const first=await discover({sort:'price-desc',limit:'2',page:'1'});
+  const second=await discover({sort:'price-desc',limit:'2',page:'2'});
+  check('W06 stable distinct pagination and total',first.status===200&&second.status===200&&slugs(first).join(',')==='discover-b,discover-d'&&slugs(second).join(',')==='discover-a,discover-e'&&second.data.data.pagination.total===6&&second.data.data.pagination.totalPages===3);
+  r=await discover({search:'D-A2'});
+  check('W06 exact SKU search returns correct detail link',r.status===200&&slugs(r).join(',')==='discover-a'&&(await anon.request('GET','/api/products/'+slugs(r)[0])).status===200);
+  r=await discover({search:'['});
+  check('W06 search escapes regex input and returns empty safely',r.status===200&&slugs(r).length===0);
+  r=await discover({inStock:'true'});
+  check('W06 stock filter excludes sold-out and inactive products',r.status===200&&slugs(r).length===5&&!slugs(r).includes('discover-c')&&!slugs(r).includes('discover-hidden'));
+  const facet = (key,value)=>({scope:'variant',key,values:[value]});
+  r=await discover({facets:JSON.stringify([facet('size','S'),facet('weight','4U')])});
+  check('W06 combined variant facets must belong to the same SKU',r.status===200&&slugs(r).length===0);
+  r=await discover({facets:JSON.stringify([facet('size','S')]),inStock:'true'});
+  check('W06 requested variant must itself be in stock',r.status===200&&slugs(r).length===0);
+  r=await discover({facets:JSON.stringify([facet('size','M'),facet('weight','4U')]),inStock:'true'});
+  check('W06 valid combined facets include matching SKU',r.status===200&&slugs(r).join(',')==='discover-f'&&r.data.data.filters.facets.length===2);
+  r=await discover({minPrice:'200',maxPrice:'100'});
+  check('W06 reversed price range rejected',r.status===400);
+  r=await discover({page:'0'});
+  check('W06 invalid pagination rejected',r.status===400);
   const refreshBeforeLogout=a.cookies.get('refreshToken');r=await a.request('POST','/api/auth/logout');check('W03 logout clears cookies',r.status===200&&!a.cookies.has('accessToken')&&!a.cookies.has('refreshToken'));
   r=await a.request('GET','/api/auth/me');check('W03 logged-out session denied',r.status===401);
   const afterLogout=new Session();afterLogout.cookies.set('refreshToken',refreshBeforeLogout);r=await afterLogout.request('POST','/api/auth/refresh');check('W03 refresh revoked on logout',r.status===401);

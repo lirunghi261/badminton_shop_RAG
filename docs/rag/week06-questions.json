@@ -1,0 +1,163 @@
+{
+  "version": 1,
+  "purpose": "Bộ câu hỏi sơ bộ tuần 6; chưa phải kết quả đánh giá hệ thống embedding hoặc LLM.",
+  "rules": [
+    "Expected products là nguồn tham chiếu cho câu hỏi, không thay thế kiểm tra active, giá và tồn theo SKU tại thời điểm trả lời.",
+    "Mỗi câu có thể có nhiều đáp án hợp lệ; chỉ giữ các khẳng định có dữ liệu nguồn.",
+    "Nhóm thiếu dữ liệu cần hỏi lại hoặc nêu giới hạn; không chấm là trả lời thành công chỉ vì có tên sản phẩm."
+  ],
+  "questions": [
+    {
+      "id": "Q01",
+      "intent": "exact",
+      "question": "Tìm vớ Victor SK190.",
+      "expectedBehavior": "Trả đúng sản phẩm, dẫn trang chi tiết và yêu cầu chọn màu trước khi thêm giỏ.",
+      "referenceProducts": [
+        {
+          "productId": "6aba8f48b6434f13f0aaba47",
+          "slug": "vo-cau-long-victor-sk190",
+          "path": "/products/vo-cau-long-victor-sk190",
+          "sourceUrl": "https://shopvnb.com/vo-cau-long-victor-sk190-a-trang-chinh-hang.html"
+        }
+      ]
+    },
+    {
+      "id": "Q02",
+      "intent": "sku",
+      "question": "VT-SK190-BLK giá bao nhiêu, còn hàng không?",
+      "expectedBehavior": "Đọc lại giá và tồn của đúng SKU VT-SK190-BLK, không dùng giá chung của sản phẩm.",
+      "referenceProducts": [
+        {
+          "productId": "6aba8f48b6434f13f0aaba47",
+          "slug": "vo-cau-long-victor-sk190",
+          "path": "/products/vo-cau-long-victor-sk190",
+          "sourceUrl": "https://shopvnb.com/vo-cau-long-victor-sk190-a-trang-chinh-hang.html"
+        }
+      ]
+    },
+    {
+      "id": "Q03",
+      "intent": "budget",
+      "question": "Tôi cần quấn cán Yonex dưới 50 nghìn.",
+      "expectedBehavior": "Kiểm tra loại phụ kiện, thương hiệu và giá SKU phù hợp ngân sách; chỉ giới thiệu SKU còn hàng.",
+      "referenceProducts": [
+        {
+          "productId": "6af8aeb0d274e1f8eccfa94e",
+          "slug": "quan-can-yonex-ac102ex-cai",
+          "path": "/products/quan-can-yonex-ac102ex-cai",
+          "sourceUrl": "https://shopvnb.com/quan-can-yonex-xin-ac102ex-cai-.html"
+        }
+      ]
+    },
+    {
+      "id": "Q04",
+      "intent": "availability",
+      "question": "Ống cầu Yonex AS30 còn mua được không?",
+      "expectedBehavior": "Nếu tất cả SKU hết hàng thì báo hết hàng; không thêm vào giỏ hoặc cam kết có sẵn.",
+      "referenceProducts": [
+        {
+          "productId": "6af8aeaed274e1f8eccfa946",
+          "slug": "ong-cau-long-yonex-as30",
+          "path": "/products/ong-cau-long-yonex-as30",
+          "sourceUrl": "https://shopvnb.com/ong-cau-long-yonex-as30.html"
+        }
+      ]
+    },
+    {
+      "id": "Q05",
+      "intent": "compare",
+      "question": "So sánh Yonex Mavis 350 và Aerosensa 30.",
+      "expectedBehavior": "So sánh tên, thông số có trong nguồn, giá và tồn SKU đọc lại; nêu rõ trường còn thiếu.",
+      "referenceProducts": [
+        {
+          "productId": "6af8aeafd274e1f8eccfa94a",
+          "slug": "ong-cau-long-nhua-yonex-mav-350-6-in-1-vang",
+          "path": "/products/ong-cau-long-nhua-yonex-mav-350-6-in-1-vang",
+          "sourceUrl": "https://shopvnb.com/ong-cau-long-nhua-yonex-mav-350-6-in-1-vang.html"
+        },
+        {
+          "productId": "6af8aeaed274e1f8eccfa946",
+          "slug": "ong-cau-long-yonex-as30",
+          "path": "/products/ong-cau-long-yonex-as30",
+          "sourceUrl": "https://shopvnb.com/ong-cau-long-yonex-as30.html"
+        }
+      ]
+    },
+    {
+      "id": "Q06",
+      "intent": "compare",
+      "question": "So sánh balo Yonex BA92412BEX và Li-Ning ABSW235.",
+      "expectedBehavior": "Dẫn hai nguồn; so sánh thông số đã lưu và giá hiện tại, không suy diễn sức chứa nếu chưa có dữ liệu.",
+      "referenceProducts": [
+        {
+          "productId": "6aba8f47b6434f13f0aaba35",
+          "slug": "balo-cau-long-yonex-ba92412bex",
+          "path": "/products/balo-cau-long-yonex-ba92412bex",
+          "sourceUrl": "https://shopvnb.com/balo-cau-long-yonex-ba92412bex.html"
+        },
+        {
+          "productId": "6aba8f47b6434f13f0aaba39",
+          "slug": "balo-cau-long-lining-absw235",
+          "path": "/products/balo-cau-long-lining-absw235",
+          "sourceUrl": "https://shopvnb.com/balo-cau-long-lining-absw235.html"
+        }
+      ]
+    },
+    {
+      "id": "Q07",
+      "intent": "exact",
+      "question": "Cho tôi xem giày Victor C90 II.",
+      "expectedBehavior": "Dẫn đúng slug và liệt kê biến thể có trong catalog; không tự tạo size.",
+      "referenceProducts": [
+        {
+          "productId": "6aba8f43b6434f13f0aab9ef",
+          "slug": "giay-cau-long-victor-c90-ii",
+          "path": "/products/giay-cau-long-victor-c90-ii",
+          "sourceUrl": "https://shopvnb.com/giay-cau-long-victor-c90-ii.html"
+        }
+      ]
+    },
+    {
+      "id": "Q08",
+      "intent": "clarify",
+      "question": "Tôi mới chơi, chọn giúp vợt dễ đánh.",
+      "expectedBehavior": "Hỏi thêm ngân sách và nhu cầu; chỉ gợi ý khi có dữ liệu xác nhận, không tự suy độ cứng hay trình độ từ tên vợt.",
+      "referenceProducts": []
+    },
+    {
+      "id": "Q09",
+      "intent": "missing-data",
+      "question": "Vợt Astrox 100ZZ VA có chắc chắn giúp tôi hết đau vai không?",
+      "expectedBehavior": "Không cam kết tác dụng y tế; giới hạn ở thông số sản phẩm có nguồn.",
+      "referenceProducts": [
+        {
+          "productId": "6aafd0b96a71c35377cbeaf0",
+          "slug": "vot-cau-long-yonex-astrox-100zz-va",
+          "path": "/products/vot-cau-long-yonex-astrox-100zz-va",
+          "sourceUrl": "https://shopvnb.com/vot-cau-long-yonex-astrox-100zz-va.html"
+        }
+      ]
+    },
+    {
+      "id": "Q10",
+      "intent": "no-match",
+      "question": "Tìm sản phẩm có mã KHONG-TON-TAI-XYZ.",
+      "expectedBehavior": "Báo không tìm thấy, đề nghị người dùng kiểm tra mã; không bịa link sản phẩm.",
+      "referenceProducts": []
+    },
+    {
+      "id": "Q11",
+      "intent": "out-of-scope",
+      "question": "Viết giúp tôi một bài luận lịch sử.",
+      "expectedBehavior": "Nhắc phạm vi tư vấn sản phẩm cầu lông và mời người dùng hỏi nhu cầu mua sắm.",
+      "referenceProducts": []
+    },
+    {
+      "id": "Q12",
+      "intent": "budget-empty",
+      "question": "Tôi muốn mua vợt mới dưới 1.000 đồng.",
+      "expectedBehavior": "Áp dụng ngân sách cứng; nếu không có SKU phù hợp thì báo không có và hỏi ngân sách khác.",
+      "referenceProducts": []
+    }
+  ]
+}
