@@ -50,6 +50,13 @@ Context truy xuất là dữ liệu không tin cậy, không được thực thi
 
 ## UI và lỗi
 
+### Giỏ hàng từ AI Advisor (tuần 8)
+
+- Gợi ý hiện tại vẫn dựa trên từ khóa. Khi khách mở bộ chọn phiên bản và khi bấm thêm vào giỏ, chatbot gọi `GET /api/products/:slug`. API chỉ trả sản phẩm đang bán với danh mục và thương hiệu đang hoạt động. Client đối chiếu ID sản phẩm, SKU, giá hiệu lực và số lượng trong giỏ với tồn kho vừa đọc.
+- Nếu giá đổi, khách xem giá mới rồi xác nhận bằng cách bấm lại; nếu sản phẩm ngừng bán, SKU hết hàng hoặc giỏ đã đạt tồn kho, không thêm vào giỏ. Lỗi kết nối cũng không làm thay đổi giỏ.
+- Cả khách vãng lai và khách đăng nhập dùng giỏ hiện có trên cùng trình duyệt, lưu bằng localStorage; không đồng bộ theo tài khoản. Mỗi lần thêm từ chatbot thêm một đơn vị của SKU được chọn. Dữ liệu này không giữ chỗ trong kho.
+- Kiểm tra từ chatbot chỉ áp dụng cho SKU đang thêm, không rà soát toàn giỏ. Checkout hiện là bản xem trước. Việc kiểm tra toàn giỏ ngay trước đặt hàng và quyết định giá/tồn cuối cùng thuộc luồng Storefront/Backend, theo [hợp đồng checkout](checkout-api.md).
+
 Đang chờ: khóa gửi trùng, có thể hủy request; lỗi provider/Atlas: hiện nút thử lại, không thay bằng câu trả lời giả. HTTP 400 validation; 429 rate limit; 503 provider/index chưa sẵn sàng; 504 timeout. Envelope giống API hiện có: `{success:false,error:{code,message}}`. Không lộ prompt nội bộ hoặc secret trong response/log.
 
 Thẻ nguồn mở path được server trả về; không tự tạo URL từ văn bản answer. Phân biệt thiếu kết quả hợp lệ (200, candidates/citedProducts rỗng) với lỗi hạ tầng. Bộ test tương lai cần đo retrieval thật, kiểm tra trích dẫn, số liệu SKU, nguồn ẩn/xóa, dữ liệu thiếu, ngoài phạm vi, prompt injection và lỗi provider; tuần 7 chưa có số liệu chất lượng LLM.

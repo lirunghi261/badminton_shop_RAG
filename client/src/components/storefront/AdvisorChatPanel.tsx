@@ -13,6 +13,7 @@ import type { StorefrontProduct } from "../../api/storefront/products.api";
 import { paths } from "../../routes/paths";
 import { formatCurrency, getPrimaryImage, getStartingPrice } from "./productPresentation";
 import { advisorSuggestions, createAdvisorReply } from "./advisorPrompts";
+import { AdvisorCartAction } from "./AdvisorCartAction";
 
 interface ChatMessage {
   id: number;
@@ -30,26 +31,29 @@ function AdvisorProductResult({ product }: { product: StorefrontProduct }) {
   const [imageFailed, setImageFailed] = useState(false);
 
   return (
-    <Link className="advisor-product-result" to={paths.productDetail(product.slug)}>
-      <span className="advisor-product-image">
-        {image && !imageFailed ? (
-          <img
-            src={image.url}
-            alt={image.alt || product.name}
-            loading="lazy"
-            onError={() => setImageFailed(true)}
-          />
-        ) : (
-          <PictureOutlined aria-label="Chưa có ảnh" />
-        )}
-      </span>
-      <span className="advisor-product-copy">
-        <small>{product.brand.name} · {product.category.name}</small>
-        <strong>{product.name}</strong>
-        <b>{formatCurrency(getStartingPrice(product))}</b>
-      </span>
-      <ArrowRightOutlined aria-hidden="true" />
-    </Link>
+    <div>
+      <Link className="advisor-product-result" to={paths.productDetail(product.slug)}>
+        <span className="advisor-product-image">
+          {image && !imageFailed ? (
+            <img
+              src={image.url}
+              alt={image.alt || product.name}
+              loading="lazy"
+              onError={() => setImageFailed(true)}
+            />
+          ) : (
+            <PictureOutlined aria-label="Chưa có ảnh" />
+          )}
+        </span>
+        <span className="advisor-product-copy">
+          <small>{product.brand.name} · {product.category.name}</small>
+          <strong>{product.name}</strong>
+          <b>Từ {formatCurrency(getStartingPrice(product))}</b>
+        </span>
+        <ArrowRightOutlined aria-hidden="true" />
+      </Link>
+      <AdvisorCartAction product={product} />
+    </div>
   );
 }
 

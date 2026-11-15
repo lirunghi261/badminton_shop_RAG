@@ -43,7 +43,7 @@ export function createAdvisorReply(question: string, products: StorefrontProduct
     .slice(0, 3)
     .map(({ product }) => product);
   const message = ranked.length
-    ? "Mình đã chọn một vài sản phẩm có điểm phù hợp cao theo từ khóa bạn nhập. Hãy mở trang chi tiết để so sánh biến thể, giá và tồn kho trước khi thêm vào giỏ."
+    ? "Mình tìm được vài sản phẩm theo từ khóa bạn nhập. Bạn có thể mở trang chi tiết hoặc chọn phiên bản ngay bên dưới để xem giá và tồn kho hiện tại."
     : "Mình chưa tìm thấy sản phẩm khớp rõ ràng. Bạn hãy cho mình biết thêm ngân sách, trình độ hoặc loại dụng cụ đang cần nhé.";
   return { message, products: ranked };
 }

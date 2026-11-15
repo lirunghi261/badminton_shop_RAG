@@ -38,6 +38,11 @@
 .advisor-product-copy strong { overflow: hidden; margin: 2px 0; color: var(--ink); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
 .advisor-product-copy b { color: var(--ocean-700); font-size: 12px; }
 .advisor-product-result > .anticon { color: var(--ocean-600); }
+.advisor-cart-action { display: grid; justify-items: start; gap: 6px; margin: 7px 0 4px; }
+.advisor-cart-controls { display: grid; min-width: 0; width: 100%; max-width: 340px; gap: 6px; justify-items: start; }
+.advisor-cart-controls .ant-select { width: 100%; }
+.advisor-cart-price, .advisor-cart-notice { color: var(--muted); font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.advisor-cart-notice a { color: var(--ocean-700); text-decoration: underline; }
 .advisor-chat-composer { padding: 14px 18px 16px; border-top: 1px solid var(--line); background: #fff; }
 .advisor-suggestion-label { display: block; margin-bottom: 7px; color: #71899b; font-size: 10px; font-weight: 750; }
 .advisor-suggestions { display: flex; gap: 7px; margin-bottom: 11px; overflow-x: auto; scrollbar-width: none; }
