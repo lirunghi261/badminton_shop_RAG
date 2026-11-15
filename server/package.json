@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "test:week-08": "npm run build && node tests/week-08.integration.mjs",
+    "rag:plan": "tsx src/scripts/planRagSync.ts",
     "test:week-07": "npm run build && node tests/week-07.integration.mjs",
     "test:weeks-01-04": "npm run build && node tests/weeks-01-04.integration.mjs",
     "dev": "tsx watch src/server.ts",

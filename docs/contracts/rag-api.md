@@ -6,7 +6,7 @@ Tuần 7 thống nhất cấu trúc giao tiếp; endpoint retrieval/chat thật 
 
 Luồng online: React → Express nhận diện ý định/điều kiện → embedding câu hỏi → Atlas Vector Search → lọc ứng viên hợp lệ → đọc Product Database theo productId/SKU → LLM tổng hợp → trả câu trả lời kèm nguồn.
 
-Tài liệu embedding chỉ chứa nội dung ngữ nghĩa ổn định: tên, mô tả đã làm sạch, danh mục, thương hiệu, thông số có nguồn. Metadata gồm documentId, productId, slug, categoryId, brandId, contentVersion, embeddingModel, embeddingDimensions, sourceUrl và indexedAt. Không đưa giá/tồn vào nội dung dùng làm căn cứ chào bán. Export `buildRagText` hiện có giá/tồn phải được tách trước khi triển khai ingestion thật; tuần 7 chưa thay export preview thành pipeline mới.
+Tài liệu embedding chỉ chứa nội dung ngữ nghĩa ổn định: tên, mô tả đã làm sạch, danh mục, thương hiệu, thông số và thuộc tính SKU có nguồn. Metadata gồm documentId, productId, slug, categoryId, brandId, contentVersion, embeddingModel, embeddingDimensions, sourceUrl và indexedAt. Tuần 8 đã tách giá/tồn, ảnh và updatedAt khỏi `buildRagText`; preview trả thêm `document` được Zod kiểm tra. Schema, phiên bản và kế hoạch đồng bộ chi tiết ở [tài liệu tuần 8](../rag/week08-document-sync.md). Embedding/Vector Search/LLM chưa triển khai; metadata embedding là null.
 
 Giá, tồn, ảnh và trạng thái bán đọc lại từ Product Database sau retrieval. Lọc active áp dụng cho cả sản phẩm, danh mục và thương hiệu. Điều kiện ngân sách, SKU, size và còn hàng phải khớp cùng một SKU; không ghép thuộc tính từ các SKU khác nhau.
 

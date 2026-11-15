@@ -12,6 +12,7 @@ import { ordersRouter } from "./modules/orders/orders.routes.js";
 import { productsRouter } from "./modules/products/products.routes.js";
 import { publicProductsRouter } from "./modules/products/public-products.routes.js";
 import { ragRouter } from "./modules/rag/rag.routes.js";
+import { checkoutRouter } from "./modules/checkout/checkout.routes.js";
 import { catalogImagesRouter, uploadsRouter } from "./modules/uploads/uploads.routes.js";
 import { usersRouter } from "./modules/users/users.routes.js";
 
@@ -35,6 +36,7 @@ app.get("/api/health", (_request, response) => {
 app.use("/api/auth", authRouter);
 app.use("/api/products", publicProductsRouter);
 app.use("/api/rag", ragRouter);
+app.use("/api/checkout", checkoutRouter);
 app.use("/api/admin/dashboard", dashboardRouter);
 app.use("/api/admin/orders", ordersRouter);
 app.use("/api/admin/users", usersRouter);

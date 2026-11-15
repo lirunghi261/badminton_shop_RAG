@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { buildRagText, listCatalogProducts } from "../catalog/catalog.service.js";
+import { buildRagDocument } from "./rag-document.js";
 
 export async function previewRagData(_request: Request, response: Response): Promise<void> {
   const products = await listCatalogProducts({ limit: 3 });
@@ -21,6 +22,7 @@ export async function previewRagData(_request: Request, response: Response): Pro
       totalStock: product.totalStock,
       primaryImage: product.primaryImage,
       ragText: buildRagText(product),
+      document: buildRagDocument(product),
     })),
   });
 }

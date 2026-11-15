@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "documentId": "product:000000000000000000000001",
+  "productId": "000000000000000000000001",
+  "categoryId": "000000000000000000000002",
+  "brandId": "000000000000000000000003",
+  "slug": "sample",
+  "sourceUrl": "/products/sample",
+  "content": "Tên sản phẩm: Vợt thử nghiệm\nThương hiệu: Brand\nDanh mục: Vợt\nMô tả ngắn: Dễ chơi\nMô tả: Mô tả sản phẩm\nThông số kỹ thuật:\n- Độ dẻo: Dẻo\n- Khối lượng: 83 g\nBiến thể:\n- SKU SKU-1: màu Đen",
+  "contentVersion": "2ca12b37b802e16bae49b57f54ec4c7c853cd8b1f551088d293b699fbdf67b8f",
+  "status": "active",
+  "embeddingModel": null,
+  "embeddingDimensions": null,
+  "indexedAt": null
+}

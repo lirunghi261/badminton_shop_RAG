@@ -1,0 +1,339 @@
+{
+  "suite": "week-08",
+  "executedAt": "2026-11-15T09:42:58.893Z",
+  "isolatedDatabase": true,
+  "results": [
+    {
+      "name": "RAG valid schema, stable identity and no claimed embedding",
+      "pass": true
+    },
+    {
+      "name": "RAG rejects forged hash and unknown fields",
+      "pass": true
+    },
+    {
+      "name": "RAG excludes live prices, stock and updated timestamp",
+      "pass": true
+    },
+    {
+      "name": "RAG live-only edits preserve contentVersion",
+      "pass": true
+    },
+    {
+      "name": "RAG array order does not change contentVersion",
+      "pass": true
+    },
+    {
+      "name": "RAG semantic edits change contentVersion",
+      "pass": true
+    },
+    {
+      "name": "RAG category reference edit changes version",
+      "pass": true
+    },
+    {
+      "name": "RAG rejects incomplete embedding metadata",
+      "pass": true
+    },
+    {
+      "name": "RAG new document schedules embedding",
+      "pass": true
+    },
+    {
+      "name": "RAG repeated snapshot is idempotent",
+      "pass": true
+    },
+    {
+      "name": "RAG semantic edit schedules reindex",
+      "pass": true
+    },
+    {
+      "name": "RAG slug edit updates metadata without embedding",
+      "pass": true
+    },
+    {
+      "name": "RAG absent public product deactivates document",
+      "pass": true
+    },
+    {
+      "name": "RAG inactive repeated snapshot is idempotent",
+      "pass": true
+    },
+    {
+      "name": "RAG active again schedules fresh embedding",
+      "pass": true
+    },
+    {
+      "name": "RAG rejects duplicate snapshot identities",
+      "pass": true
+    },
+    {
+      "name": "customer registration enforces customer role and normalizes email",
+      "pass": true
+    },
+    {
+      "name": "customer cookies are HttpOnly and SameSite, separate from admin",
+      "pass": true
+    },
+    {
+      "name": "auth response excludes password and token hash",
+      "pass": true
+    },
+    {
+      "name": "registration rejects invalid phone",
+      "pass": true
+    },
+    {
+      "name": "registration rejects duplicate email",
+      "pass": true
+    },
+    {
+      "name": "registration rejects duplicate phone",
+      "pass": true
+    },
+    {
+      "name": "customer cookie cannot access /api/admin/users",
+      "pass": true
+    },
+    {
+      "name": "customer cookie cannot access /api/admin/orders",
+      "pass": true
+    },
+    {
+      "name": "customer cookie cannot access /api/admin/products",
+      "pass": true
+    },
+    {
+      "name": "customer cookie cannot access /api/admin/dashboard/summary",
+      "pass": true
+    },
+    {
+      "name": "customer token copied into admin cookie is forbidden",
+      "pass": true
+    },
+    {
+      "name": "expired customer access token rejected",
+      "pass": true
+    },
+    {
+      "name": "concurrent refresh accepts token exactly once",
+      "pass": true
+    },
+    {
+      "name": "rotated session can read customer profile",
+      "pass": true
+    },
+    {
+      "name": "stale logout cannot revoke newer rotated session",
+      "pass": true
+    },
+    {
+      "name": "logout clears customer cookies",
+      "pass": true
+    },
+    {
+      "name": "logged out refresh token is revoked",
+      "pass": true
+    },
+    {
+      "name": "customer login by email",
+      "pass": true
+    },
+    {
+      "name": "customer login by phone",
+      "pass": true
+    },
+    {
+      "name": "wrong password rejected",
+      "pass": true
+    },
+    {
+      "name": "admin cannot use customer login",
+      "pass": true
+    },
+    {
+      "name": "blocked customer cannot use existing access",
+      "pass": true
+    },
+    {
+      "name": "blocked customer cannot refresh",
+      "pass": true
+    },
+    {
+      "name": "blocked customer cannot login",
+      "pass": true
+    },
+    {
+      "name": "deleted customer cannot access profile",
+      "pass": true
+    },
+    {
+      "name": "deleted customer cannot refresh",
+      "pass": true
+    },
+    {
+      "name": "admin token cannot impersonate customer",
+      "pass": true
+    },
+    {
+      "name": "guest cart check uses live SKU zero price",
+      "pass": true
+    },
+    {
+      "name": "cart check is not cached and does not reserve stock",
+      "pass": true
+    },
+    {
+      "name": "stale client price reports live price and requires confirmation",
+      "pass": true
+    },
+    {
+      "name": "duplicate SKU quantities are combined before checking stock",
+      "pass": true
+    },
+    {
+      "name": "inherited sale never exceeds SKU regular price",
+      "pass": true
+    },
+    {
+      "name": "server calculates full cart subtotal from live SKU prices",
+      "pass": true
+    },
+    {
+      "name": "SKU must belong to requested product",
+      "pass": true
+    },
+    {
+      "name": "missing product is unavailable",
+      "pass": true
+    },
+    {
+      "name": "reject invalid cart {\"productId\":\"6af97e9ee8cc419c2480d9a3\",\"sku\":\"W08-A\",\"quantity\":0}",
+      "pass": true
+    },
+    {
+      "name": "reject invalid cart {\"productId\":\"6af97e9ee8cc419c2480d9a3\",\"sku\":\"W08-A\",\"quantity\":1.5}",
+      "pass": true
+    },
+    {
+      "name": "reject invalid cart {\"productId\":\"bad\",\"sku\":\"W08-A\",\"quantity\":2}",
+      "pass": true
+    },
+    {
+      "name": "reject invalid cart {\"productId\":\"6af97e9ee8cc419c2480d9a3\",\"sku\":\"W08-A\",\"quantity\":2,\"unitPrice\":1}",
+      "pass": true
+    },
+    {
+      "name": "reject invalid cart {\"productId\":\"6af97e9ee8cc419c2480d9a3\",\"sku\":\"W08-A\",\"quantity\":2,\"expectedUnitPrice\":-1}",
+      "pass": true
+    },
+    {
+      "name": "reject empty cart",
+      "pass": true
+    },
+    {
+      "name": "reject more than 50 lines",
+      "pass": true
+    },
+    {
+      "name": "reject client subtotal",
+      "pass": true
+    },
+    {
+      "name": "RAG text strips HTML and omits live data",
+      "pass": true
+    },
+    {
+      "name": "preview returns validated document schema",
+      "pass": true
+    },
+    {
+      "name": "cart excludes inactive product",
+      "pass": true
+    },
+    {
+      "name": "RAG deactivates inactive product",
+      "pass": true
+    },
+    {
+      "name": "RAG reactivates after inactive product",
+      "pass": true
+    },
+    {
+      "name": "cart excludes draft product",
+      "pass": true
+    },
+    {
+      "name": "RAG deactivates draft product",
+      "pass": true
+    },
+    {
+      "name": "RAG reactivates after draft product",
+      "pass": true
+    },
+    {
+      "name": "cart excludes deleted product",
+      "pass": true
+    },
+    {
+      "name": "RAG deactivates deleted product",
+      "pass": true
+    },
+    {
+      "name": "RAG reactivates after deleted product",
+      "pass": true
+    },
+    {
+      "name": "cart excludes inactive category",
+      "pass": true
+    },
+    {
+      "name": "RAG deactivates inactive category",
+      "pass": true
+    },
+    {
+      "name": "RAG reactivates after inactive category",
+      "pass": true
+    },
+    {
+      "name": "cart excludes deleted category",
+      "pass": true
+    },
+    {
+      "name": "RAG deactivates deleted category",
+      "pass": true
+    },
+    {
+      "name": "RAG reactivates after deleted category",
+      "pass": true
+    },
+    {
+      "name": "cart excludes inactive brand",
+      "pass": true
+    },
+    {
+      "name": "RAG deactivates inactive brand",
+      "pass": true
+    },
+    {
+      "name": "RAG reactivates after inactive brand",
+      "pass": true
+    },
+    {
+      "name": "cart excludes deleted brand",
+      "pass": true
+    },
+    {
+      "name": "RAG deactivates deleted brand",
+      "pass": true
+    },
+    {
+      "name": "RAG reactivates after deleted brand",
+      "pass": true
+    },
+    {
+      "name": "isolated test database documents cleaned",
+      "pass": true
+    }
+  ]
+}

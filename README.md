@@ -150,6 +150,8 @@ sẽ bị thu hồi. Hệ thống luôn bảo vệ ít nhất một quản trị
 npm run dev         # Chạy client và server
 npm run build       # Kiểm tra TypeScript và build production
 npm run lint        # Chạy kiểm tra tĩnh
+npm run test:week-08 # Kiểm thử customer auth, kiểm tra giỏ và schema/đồng bộ RAG
+npm run rag:plan -- --output ../docs/evidence/rag-plan.json # Xuất kế hoạch RAG, không ghi index
 npm run seed:admin  # Tạo/cập nhật tài khoản admin từ server/.env
 npm run seed:catalog # Upsert danh mục và thương hiệu cầu lông mẫu
 npm run seed:products # Thêm bộ sản phẩm mẫu và lưu ảnh vào MongoDB GridFS

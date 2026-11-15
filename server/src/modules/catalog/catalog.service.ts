@@ -81,9 +81,6 @@ export function buildRagText(product: NormalizedCatalogProduct): string {
     `Tên sản phẩm: ${product.name}`,
     `Thương hiệu: ${product.brandName ?? "Chưa có dữ liệu"}`,
     `Danh mục: ${product.categoryName ?? "Chưa có dữ liệu"}`,
-    `Giá gốc: ${formatPrice(product.basePrice)}`,
-    `Giá khuyến mãi: ${formatPrice(product.salePrice)}`,
-    `Giá hiệu lực: ${formatPrice(product.effectivePrice)}`,
     `Mô tả ngắn: ${product.shortDescription || "Chưa có dữ liệu"}`,
     `Mô tả: ${product.description || "Chưa có dữ liệu"}`,
     "Thông số kỹ thuật:",
@@ -91,7 +88,7 @@ export function buildRagText(product: NormalizedCatalogProduct): string {
 
   if (product.specifications.length > 0) {
     lines.push(
-      ...product.specifications.map((specification) => {
+      ...[...product.specifications].sort((a, b) => a.key.localeCompare(b.key, "en")).map((specification) => {
         const unit = specification.unit ? ` ${specification.unit}` : "";
         return `- ${specification.label}: ${formatPrimitive(specification.value)}${unit}`;
       }),
@@ -100,28 +97,18 @@ export function buildRagText(product: NormalizedCatalogProduct): string {
     lines.push("- Chưa có dữ liệu");
   }
 
-  lines.push(`Tồn kho: ${product.totalStock}`);
-
   if (product.variants.length > 0) {
     lines.push("Biến thể:");
     lines.push(
-      ...product.variants.map((variant) => {
-        const attributes = variant.attributes
+      ...[...product.variants].sort((a, b) => a.sku.localeCompare(b.sku, "en")).map((variant) => {
+        const attributes = [...variant.attributes].sort((a, b) => a.key.localeCompare(b.key, "en"))
           .map((attribute) => `${attribute.label}: ${formatPrimitive(attribute.value)}`)
           .join(", ");
         const details = attributes ? `; ${attributes}` : "";
-        return `- SKU ${variant.sku}: màu ${variant.colorName || "Chưa có dữ liệu"}; giá bán ${formatPrice(variant.effectivePrice)}; tồn kho ${variant.stock}${details}`;
+        return `- SKU ${variant.sku}: màu ${variant.colorName || "Chưa có dữ liệu"}${details}`;
       }),
     );
   }
-
-  if (product.primaryImage) {
-    lines.push(`Ảnh chính: ${product.primaryImage.url}`);
-  }
-
-  lines.push(`Slug: ${product.slug}`);
-  lines.push(`ID: ${product.id}`);
-  lines.push(`Cập nhật lúc: ${product.updatedAt?.toISOString() ?? "Chưa có dữ liệu"}`);
 
   return lines.join("\n");
 }
@@ -307,12 +294,4 @@ function formatPrimitive(value: CatalogPrimitive): string {
   }
 
   return String(value);
-}
-
-function formatPrice(value: number | null): string {
-  if (value === null) {
-    return "Chưa có dữ liệu";
-  }
-
-  return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(value);
 }

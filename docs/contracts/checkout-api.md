@@ -2,7 +2,49 @@
 
 ## Phạm vi tuần 7
 
-Đây là hợp đồng cho bước triển khai tạo đơn ở tuần 9. Hiện tại checkout chỉ xem trước thông tin; các endpoint khách hàng bên dưới chưa được triển khai. Không dùng đơn seed trong Admin làm minh chứng khách đã đặt hàng. Giao diện thành công và Đơn của tôi sẽ nối API khi chức năng tạo đơn được triển khai.
+Các endpoint tạo đơn/đơn của tôi bên dưới là hợp đồng cho tuần 9, chưa triển khai. Tuần 8 đã triển khai riêng `POST /api/checkout/check` để kiểm tra giá/tồn toàn giỏ. Giao diện checkout hiện vẫn xem trước, chưa nối endpoint kiểm tra toàn giỏ. Không dùng đơn seed trong Admin làm minh chứng khách đã đặt hàng.
+
+## Kiểm tra toàn giỏ — đã triển khai tuần 8
+
+`POST /api/checkout/check`, JSON; dùng được cho khách vãng lai và khách đăng nhập. Giới hạn 60 request/phút/IP. Không tạo đơn, không giữ chỗ hay trừ tồn. Response đặt `Cache-Control: no-store`.
+
+```json
+{
+  "items": [{
+    "productId": "000000000000000000000001",
+    "sku": "VT-SK190-BLK",
+    "quantity": 2,
+    "expectedUnitPrice": 105000
+  }]
+}
+```
+
+`items`: 1–50 dòng. `productId`: 24 ký tự hex; `sku`: trim, 1–100 ký tự, đối chiếu chính xác với SKU lưu trong DB; `quantity`: số nguyên 1–999 mỗi dòng. Dòng trùng productId/SKU được gộp trước kiểm tra tồn. `expectedUnitPrice` tùy chọn, số hữu hạn không âm, chỉ dùng phát hiện giá cũ. Từ chối trường lạ ở body/dòng, kể cả `unitPrice`, `subtotal`, `stock` do client tự gửi.
+
+Response HTTP 200 khi body hợp lệ, kể cả có sản phẩm không mua được:
+
+```json
+{
+  "success": true,
+  "data": {
+    "checkedAt": "2026-11-15T10:00:00.000Z",
+    "canCheckout": true,
+    "items": [{
+      "productId": "000000000000000000000001", "sku": "VT-SK190-BLK",
+      "quantity": 2, "unitPrice": 105000, "stock": 24,
+      "lineTotal": 210000, "priceChanged": false, "issues": []
+    }],
+    "subtotal": 210000,
+    "reservation": false
+  }
+}
+```
+
+Số liệu trên là ví dụ. Server chỉ lấy product/category/brand `active`, chưa xóa mềm; SKU phải thuộc đúng sản phẩm. Giá thường = `variant.price ?? product.basePrice`; giá khuyến mãi = `variant.salePrice ?? product.salePrice ?? giá thường`; giá hiệu lực là giá nhỏ hơn giữa hai giá, giữ giá 0 hợp lệ. Đọc giá/tồn hiện tại từ MongoDB, không dùng giá trình duyệt tính tiền.
+
+`issues` có thể gồm `PRODUCT_UNAVAILABLE`, `SKU_UNAVAILABLE`, `OUT_OF_STOCK`, `PRICE_CHANGED`. Khi sản phẩm/SKU không khả dụng, unitPrice/stock/lineTotal là null, subtotal toàn giỏ là null. Nếu mọi dòng có giá hợp lệ, subtotal gồm tổng tiền tất cả lượng yêu cầu, kể cả dòng vượt tồn; không phải tổng tiền đã được chấp nhận đặt hàng. `canCheckout` chỉ true khi mọi dòng không có issue. Giá đổi yêu cầu client hiển thị giá mới, người dùng xác nhận lại và kiểm tra lại; nếu không gửi expectedUnitPrice thì client vẫn phải hiển thị giá server trả về.
+
+HTTP 400 `VALIDATION_ERROR`; HTTP 429 `TOO_MANY_REQUESTS`. Lỗi mạng/validation giữ nguyên giỏ. Giỏ localStorage có thể cũ sau mọi lần kiểm tra vì tồn kho không được giữ chỗ. Endpoint tuần 9 bắt buộc kiểm tra lại, tính tiền và trừ tồn nguyên tử; không tin `canCheckout` hoặc snapshot check trước đó. Ship/discount/total chưa thuộc endpoint này.
 
 ## Tạo đơn COD
 

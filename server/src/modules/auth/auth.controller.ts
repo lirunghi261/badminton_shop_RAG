@@ -164,8 +164,16 @@ export async function customerRefresh(request: Request, response: Response): Pro
     throw new AppError("Tài khoản khách hàng không thể truy cập.", 403, "CUSTOMER_ONLY");
   }
 
-  await startCustomerSession(user, response);
-  response.json({ success: true, data: { user: publicUser(user) } });
+  const accessToken = createAccessToken(user.id, "customer");
+  const refreshToken = createRefreshToken(user.id, "customer");
+  const rotated = await UserModel.findOneAndUpdate(
+    { _id: user.id, role: "customer", status: "active", deletedAt: null, refreshTokenHash: hashToken(token) },
+    { $set: { refreshTokenHash: hashToken(refreshToken), lastLoginAt: new Date() } },
+    { returnDocument: "after" },
+  );
+  if (!rotated) throw new AppError("Phiên khách hàng đã thay đổi.", 401, "INVALID_CUSTOMER_SESSION");
+  setCustomerAuthCookies(response, accessToken, refreshToken);
+  response.json({ success: true, data: { user: publicUser(rotated) } });
 }
 
 export async function logout(request: Request, response: Response): Promise<void> {
@@ -188,7 +196,7 @@ export async function customerLogout(request: Request, response: Response): Prom
     try {
       const payload = verifyRefreshToken(token);
       await UserModel.findOneAndUpdate(
-        { _id: payload.sub, role: "customer" },
+        { _id: payload.sub, role: "customer", refreshTokenHash: hashToken(token) },
         { $unset: { refreshTokenHash: 1 } },
       );
     } catch {
