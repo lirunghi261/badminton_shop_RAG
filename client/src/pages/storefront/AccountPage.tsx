@@ -1,7 +1,8 @@
 import { LogoutOutlined, MailOutlined, PhoneOutlined, SafetyCertificateOutlined, UserOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Avatar, Button, Card, Descriptions, Skeleton, Space, Typography } from "antd";
-import { Navigate } from "react-router-dom";
+import { Alert, Avatar, Button, Card, Descriptions, Skeleton, Space, Typography } from "antd";
+import { Navigate, useNavigate } from "react-router-dom";
+import axios from "axios";
 import { useEffect } from "react";
 import { getCurrentCustomer, logoutUser } from "../../api/auth/auth.api";
 import { currentCustomerQueryKey } from "../../auth/queryKeys";
@@ -11,6 +12,7 @@ import "../../styles/storefront-account.css";
 
 export function AccountPage() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const userQuery = useQuery({
     queryKey: currentCustomerQueryKey,
     queryFn: getCurrentCustomer,
@@ -21,17 +23,19 @@ export function AccountPage() {
     mutationFn: logoutUser,
     onSuccess: () => {
       clearCustomerSession();
-      queryClient.removeQueries({ queryKey: currentCustomerQueryKey });
+      queryClient.setQueryData(currentCustomerQueryKey, null);
+      navigate(paths.login, { replace: true });
     },
   });
   const user = userQuery.data;
+  const sessionExpired = axios.isAxiosError(userQuery.error) && [401, 403].includes(userQuery.error.response?.status ?? 0);
 
   useEffect(() => {
     if (user) saveCustomerSession(user);
-    if (userQuery.isError) clearCustomerSession();
-  }, [user, userQuery.isError]);
+    if (sessionExpired) clearCustomerSession();
+  }, [user, sessionExpired]);
 
-  if (userQuery.isError) {
+  if (sessionExpired) {
     return <Navigate to={paths.login} state={{ from: paths.account }} replace />;
   }
 
@@ -47,6 +51,9 @@ export function AccountPage() {
         </header>
 
         {userQuery.isPending && <Card className="store-account-loading"><Skeleton active paragraph={{ rows: 5 }} /></Card>}
+        {userQuery.isError && <Alert type="error" showIcon message="Chưa tải được tài khoản"
+          action={<Button onClick={() => void userQuery.refetch()}>Thử lại</Button>} />}
+        {logoutMutation.isError && <Alert type="error" showIcon message="Chưa đăng xuất được. Vui lòng thử lại." />}
         {user && (
           <div className="store-account-dashboard">
             <Card className="store-profile-card">

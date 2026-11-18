@@ -4,6 +4,8 @@
 
 Backend tuần 9 đã triển khai API tạo đơn COD và API đọc đơn của khách. Đơn thật trong Admin có `source=checkout`. Tuần 8 đã triển khai `POST /api/checkout/check` để kiểm tra giá/tồn toàn giỏ. Checkout hiện là bản xem trước.
 
+Storefront gọi API khi mở hoặc cập nhật giỏ, khi chuyển sang checkout, khi mở trực tiếp checkout và trước bước xem lại đơn.
+
 ## Kiểm tra toàn giỏ — đã triển khai tuần 8
 
 `POST /api/checkout/check`, JSON; dùng được cho khách vãng lai và khách đăng nhập. Giới hạn 60 request/phút/IP. Không tạo đơn, không giữ chỗ hay trừ tồn. Response đặt `Cache-Control: no-store`.
@@ -45,6 +47,8 @@ Số liệu trên là ví dụ. Server chỉ lấy product/category/brand `activ
 `issues` có thể gồm `PRODUCT_UNAVAILABLE`, `SKU_UNAVAILABLE`, `OUT_OF_STOCK`, `PRICE_CHANGED`. Khi sản phẩm/SKU không khả dụng, unitPrice/stock/lineTotal là null, subtotal toàn giỏ là null. Nếu mọi dòng có giá hợp lệ, subtotal gồm tổng tiền tất cả lượng yêu cầu, kể cả dòng vượt tồn; không phải tổng tiền đã được chấp nhận đặt hàng. `canCheckout` chỉ true khi mọi dòng không có issue. Giá đổi yêu cầu client hiển thị giá mới, người dùng xác nhận lại và kiểm tra lại; nếu không gửi expectedUnitPrice thì client vẫn phải hiển thị giá server trả về.
 
 HTTP 400 `VALIDATION_ERROR`; HTTP 429 `TOO_MANY_REQUESTS`. Lỗi mạng/validation giữ nguyên giỏ. Giỏ localStorage có thể cũ sau mọi lần kiểm tra vì tồn kho không được giữ chỗ. Endpoint tuần 9 bắt buộc kiểm tra lại, tính tiền và trừ tồn nguyên tử; không tin `canCheckout` hoặc snapshot check trước đó. Ship/discount/total chưa thuộc endpoint này.
+
+Storefront giữ dòng hết hàng hoặc ngừng bán để khách xóa. Nếu SKU còn hàng nhưng tồn giảm, số lượng giảm về mức còn mua được. Cờ xác nhận giá mới được giữ qua tải lại và đồng bộ giữa các tab cho đến khi khách xác nhận. Sau xác nhận, thao tác tiếp tục vẫn kiểm tra server. Lỗi mạng giữ giỏ và hiển thị cách thử lại.
 
 ## Tạo đơn COD
 

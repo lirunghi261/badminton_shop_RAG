@@ -30,11 +30,14 @@ export interface CartContextValue {
   subtotal: number;
   isSyncing: boolean;
   hasUnavailableItems: boolean;
+  hasPriceChanges: boolean;
+  syncError: boolean;
   addProduct: (product: StorefrontProduct, variant?: StorefrontProductVariant, quantity?: number) => CartAddResult | null;
   updateQuantity: (key: string, quantity: number) => void;
   removeItem: (key: string) => void;
   clearCart: () => void;
-  refreshCart: () => Promise<void>;
+  refreshCart: () => Promise<boolean>;
+  acceptPrices: () => void;
 }
 
 export const CartContext = createContext<CartContextValue | null>(null);

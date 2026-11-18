@@ -1,0 +1,15 @@
+{
+  "mode": "Playwright Chromium, API fixtures",
+  "passed": 9,
+  "results": [
+    "Giỏ cũ được nâng phiên bản, gộp SKU, lọc dòng lỗi, giảm lượng theo tồn và khóa bước tiếp khi giá đổi",
+    "Xác nhận giá chỉ mở bước tiếp sau thao tác của khách, giữ trạng thái qua tải lại và chặn tăng vượt tồn",
+    "Hai tab đồng bộ số lượng qua localStorage",
+    "Mở thẳng checkout đọc tồn mới, đưa khách về giỏ và giữ dòng hết hàng để xóa",
+    "Phân biệt SKU ngừng bán với SKU tạm hết hàng",
+    "Lỗi mạng giữ giỏ và chặn checkout, thử lại thành công; giá đổi lúc xem lại buộc xác nhận",
+    "Kết quả kiểm tra đang chờ không khôi phục dòng đã xóa",
+    "Đăng ký, đăng xuất, đăng nhập lại và hồ sơ hoạt động; localStorage chỉ lưu id/tên và cookie HttpOnly",
+    "Refresh khôi phục phiên hợp lệ và trả về đăng nhập khi hết phiên, không lặp vô hạn"
+  ]
+}

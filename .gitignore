@@ -11,3 +11,6 @@ server/uploads/
 .vscode/
 # Playwright CLI output (may contain credentials)
 .playwright-cli/
+/baocao_tlcn
+/.tmp_diagrams
+/.tmp_baocao

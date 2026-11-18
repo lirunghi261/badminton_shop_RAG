@@ -10,7 +10,8 @@ import {
   type CustomerUser,
 } from "../../api/auth/auth.api";
 import { currentCustomerQueryKey } from "../../auth/queryKeys";
-import { saveCustomerSession } from "../../auth/customerSession";
+import { clearCustomerSession, saveCustomerSession } from "../../auth/customerSession";
+import { useEffect } from "react";
 import { paths } from "../../routes/paths";
 import authImage from "../../assets/storefront-hero-equipment-ocean.webp";
 import "../../styles/storefront-auth.css";
@@ -48,6 +49,10 @@ export function CustomerAuthPage({ mode }: { mode: AuthMode }) {
     retry: false,
     staleTime: 5 * 60 * 1000,
   });
+  useEffect(() => {
+    const error = currentUserQuery.error;
+    if (axios.isAxiosError(error) && [401, 403].includes(error.response?.status ?? 0)) clearCustomerSession();
+  }, [currentUserQuery.error]);
 
   const finishAuthentication = (user: CustomerUser) => {
     saveCustomerSession(user);
