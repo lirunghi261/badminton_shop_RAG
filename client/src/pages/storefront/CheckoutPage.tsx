@@ -9,10 +9,10 @@ import { CheckoutReview } from "../../components/storefront/CheckoutReview";
 import { paths } from "../../routes/paths";
 
 export function CheckoutPage() {
-  const { items, itemCount, subtotal } = useCart();
+  const { items, itemCount, subtotal, hasUnavailableItems } = useCart();
   const [checkoutValues, setCheckoutValues] = useState<CheckoutFormValues | null>(null);
   const [isReviewing, setIsReviewing] = useState(false);
-  if (!items.length) return <Navigate to={paths.cart} replace />;
+  if (!items.length || hasUnavailableItems) return <Navigate to={paths.cart} replace />;
   return <section className="store-checkout-page"><div className="store-container">
     <header className="store-checkout-heading"><span className="eyebrow">Thanh toán</span><h1>Hoàn tất thông tin đặt hàng</h1><p>Kiểm tra thông tin nhận hàng và đơn hàng trước khi xác nhận.</p></header>
     <Alert className="store-checkout-preview-notice" type="info" showIcon message="Bản xem trước checkout" description="Bạn có thể kiểm tra toàn bộ thông tin ở đây. Hệ thống chưa gửi đơn hàng hoặc thu thập thanh toán cho đến khi API đơn hàng được kết nối." />

@@ -6,7 +6,7 @@ import { formatCurrency } from "../../components/storefront/productPresentation"
 import { paths } from "../../routes/paths";
 
 export function CartPage() {
-  const { items, itemCount, subtotal, updateQuantity, removeItem, clearCart } = useCart();
+  const { items, itemCount, subtotal, updateQuantity, removeItem, clearCart, refreshCart, isSyncing, hasUnavailableItems } = useCart();
 
   if (!items.length) {
     return (
@@ -23,11 +23,15 @@ export function CartPage() {
       <div className="store-container">
         <div className="store-cart-heading">
           <div><span className="eyebrow">Giỏ hàng</span><h1>Sản phẩm bạn đã chọn</h1></div>
-          <Popconfirm title="Xóa toàn bộ giỏ hàng?" description="Thao tác này không thể hoàn tác." okText="Xóa giỏ hàng" cancelText="Hủy" onConfirm={clearCart}>
-            <Button danger type="text" icon={<DeleteOutlined />}>Xóa tất cả</Button>
-          </Popconfirm>
+          <div>
+            <Button type="text" loading={isSyncing} onClick={() => void refreshCart()}>Cập nhật giỏ hàng</Button>
+            <Popconfirm title="Xóa toàn bộ giỏ hàng?" description="Thao tác này không thể hoàn tác." okText="Xóa giỏ hàng" cancelText="Hủy" onConfirm={clearCart}>
+              <Button danger type="text" icon={<DeleteOutlined />}>Xóa tất cả</Button>
+            </Popconfirm>
+          </div>
         </div>
         <div className="store-cart-progress"><span className="active">1. Giỏ hàng</span><i /> <span>2. Thông tin giao nhận</span><i /> <span>3. Xác nhận đơn</span></div>
+        {hasUnavailableItems && <Alert className="store-cart-notice" type="warning" showIcon message="Có sản phẩm không còn hàng" description="Hãy xoá sản phẩm hết hàng trước khi tiếp tục đặt hàng." />}
         <div className="store-cart-layout">
           <div className="store-cart-items">
             {items.map((item) => (
@@ -42,8 +46,8 @@ export function CartPage() {
                 </div>
                 <strong className="store-cart-item-price">{formatCurrency(item.price)}</strong>
                 <div className="store-quantity-control">
-                  <Button size="small" shape="circle" icon={<MinusOutlined />} aria-label={`Giảm số lượng ${item.name}`} onClick={() => updateQuantity(item.key, item.quantity - 1)} />
-                  <InputNumber min={1} max={item.stock} step={1} precision={0} value={item.quantity} controls={false} aria-label={`Số lượng ${item.name}`} onChange={(value) => updateQuantity(item.key, Number(value ?? 1))} />
+                  <Button size="small" shape="circle" icon={<MinusOutlined />} disabled={item.stock < 1} aria-label={`Giảm số lượng ${item.name}`} onClick={() => updateQuantity(item.key, item.quantity - 1)} />
+                  <InputNumber min={1} max={item.stock} step={1} precision={0} value={item.quantity} disabled={item.stock < 1} controls={false} aria-label={`Số lượng ${item.name}`} onChange={(value) => updateQuantity(item.key, Number(value ?? 1))} />
                   <Button size="small" shape="circle" icon={<PlusOutlined />} disabled={item.quantity >= item.stock} aria-label={`Tăng số lượng ${item.name}`} onClick={() => updateQuantity(item.key, item.quantity + 1)} />
                 </div>
                 <div className="store-cart-line-total">
@@ -59,7 +63,7 @@ export function CartPage() {
               <div><span>Phí vận chuyển</span><span>Chọn ở bước đặt hàng</span></div>
               <div className="store-cart-total"><span>Tổng tạm tính</span><strong>{formatCurrency(subtotal)}</strong></div>
               <Alert type="info" showIcon message="Kiểm tra địa chỉ và phương thức thanh toán ở bước tiếp theo." />
-              <Link to={paths.checkout}><Button type="primary" size="large" block>Tiến hành đặt hàng</Button></Link>
+              <Link to={paths.checkout}><Button type="primary" size="large" block disabled={hasUnavailableItems}>Tiến hành đặt hàng</Button></Link>
               <Link to={paths.products} className="store-cart-continue">← Tiếp tục mua sắm</Link>
             </Card>
             <p className="store-cart-summary-note">Bạn vẫn có thể điều chỉnh số lượng hoặc xoá sản phẩm trước khi sang bước nhập thông tin nhận hàng.</p>

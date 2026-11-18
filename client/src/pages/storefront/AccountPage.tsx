@@ -2,8 +2,10 @@ import { LogoutOutlined, MailOutlined, PhoneOutlined, SafetyCertificateOutlined,
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Avatar, Button, Card, Descriptions, Skeleton, Space, Typography } from "antd";
 import { Navigate } from "react-router-dom";
+import { useEffect } from "react";
 import { getCurrentCustomer, logoutUser } from "../../api/auth/auth.api";
 import { currentCustomerQueryKey } from "../../auth/queryKeys";
+import { clearCustomerSession, saveCustomerSession } from "../../auth/customerSession";
 import { paths } from "../../routes/paths";
 import "../../styles/storefront-account.css";
 
@@ -17,9 +19,17 @@ export function AccountPage() {
   });
   const logoutMutation = useMutation({
     mutationFn: logoutUser,
-    onSuccess: () => queryClient.removeQueries({ queryKey: currentCustomerQueryKey }),
+    onSuccess: () => {
+      clearCustomerSession();
+      queryClient.removeQueries({ queryKey: currentCustomerQueryKey });
+    },
   });
   const user = userQuery.data;
+
+  useEffect(() => {
+    if (user) saveCustomerSession(user);
+    if (userQuery.isError) clearCustomerSession();
+  }, [user, userQuery.isError]);
 
   if (userQuery.isError) {
     return <Navigate to={paths.login} state={{ from: paths.account }} replace />;

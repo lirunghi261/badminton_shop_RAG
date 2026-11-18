@@ -10,6 +10,7 @@ import {
   type CustomerUser,
 } from "../../api/auth/auth.api";
 import { currentCustomerQueryKey } from "../../auth/queryKeys";
+import { saveCustomerSession } from "../../auth/customerSession";
 import { paths } from "../../routes/paths";
 import authImage from "../../assets/storefront-hero-equipment-ocean.webp";
 import "../../styles/storefront-auth.css";
@@ -49,6 +50,7 @@ export function CustomerAuthPage({ mode }: { mode: AuthMode }) {
   });
 
   const finishAuthentication = (user: CustomerUser) => {
+    saveCustomerSession(user);
     queryClient.setQueryData(currentCustomerQueryKey, user);
     const requestedPath = (location.state as { from?: string } | null)?.from;
     navigate(requestedPath?.startsWith("/") ? requestedPath : paths.account, { replace: true });
