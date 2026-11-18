@@ -1,4 +1,4 @@
-import { Types, type QueryFilter, type SortOrder } from "mongoose";
+import { Types, type ClientSession, type QueryFilter, type SortOrder } from "mongoose";
 import { AppError } from "../../utils/AppError.js";
 import {
   OrderModel,
@@ -7,6 +7,7 @@ import {
   type PaymentStatus,
 } from "./order.model.js";
 import type { ListOrdersQuery } from "./orders.schemas.js";
+import { restoreOrderStock, runOrderTransaction } from "./order-transaction.js";
 
 const STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   pending: ["confirmed", "cancelled"],
@@ -108,9 +109,9 @@ function allowedPaymentStatuses(order: Order) {
   ));
 }
 
-async function findOrder(orderId: string) {
+async function findOrder(orderId: string, session?: ClientSession) {
   assertValidId(orderId);
-  const order = await OrderModel.findById(orderId);
+  const order = await OrderModel.findById(orderId).session(session ?? null);
   if (!order) throw new AppError("Không tìm thấy đơn hàng.", 404, "ORDER_NOT_FOUND");
   return order;
 }
@@ -170,6 +171,23 @@ export async function updateOrderStatus(
   note: string,
 ) {
   const order = await findOrder(orderId);
+  if (nextStatus === "cancelled" && order.status !== "cancelled" &&
+      order.source === "checkout" && order.idempotencyKey) {
+    return runOrderTransaction(async (session) => {
+      const current = await findOrder(orderId, session);
+      return applyOrderStatus(current, adminId, nextStatus, note, session);
+    });
+  }
+  return applyOrderStatus(order, adminId, nextStatus, note);
+}
+
+async function applyOrderStatus(
+  order: Awaited<ReturnType<typeof findOrder>>,
+  adminId: string,
+  nextStatus: OrderStatus,
+  note: string,
+  session?: ClientSession,
+) {
   if (order.status === nextStatus) return serializeOrder(order);
   if (!allowedOrderStatuses(order).includes(nextStatus)) {
     throw new AppError(
@@ -216,9 +234,10 @@ export async function updateOrderStatus(
         ...(order.paymentStatus !== previousPaymentStatus ? { paymentHistory: order.paymentHistory[order.paymentHistory.length - 1]! } : {}),
       },
     },
-    { returnDocument: "after", runValidators: true },
+    { returnDocument: "after", runValidators: true, session },
   );
   if (!updated) throw new AppError("Đơn hàng vừa thay đổi. Vui lòng tải lại trước khi cập nhật.", 409, "ORDER_CHANGED");
+  if (session && nextStatus === "cancelled") await restoreOrderStock(order.items, session);
   return serializeOrder(updated);
 }
 

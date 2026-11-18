@@ -5,6 +5,7 @@ import { asyncHandler } from "../../utils/asyncHandler.js";
 import { ProductModel } from "../products/product.model.js";
 import { BrandModel } from "../brands/brand.model.js";
 import { CategoryModel } from "../categories/category.model.js";
+import { checkoutUnitPrice } from "./checkout-price.js";
 
 export const cartCheckSchema = z.strictObject({
   items: z.array(z.strictObject({
@@ -48,9 +49,7 @@ checkoutRouter.post("/check", rateLimit({
       unitPrice: null, stock: null, lineTotal: null, priceChanged: false,
       issues: [available ? "SKU_UNAVAILABLE" : "PRODUCT_UNAVAILABLE"],
     };
-    const regular = variant.price ?? product.basePrice;
-    const sale = variant.salePrice ?? product.salePrice ?? regular;
-    const unitPrice = Math.min(regular, sale);
+    const unitPrice = checkoutUnitPrice(product, variant);
     const priceChanged = line.expected.some((price) => price !== unitPrice);
     const issues: string[] = [];
     if (line.quantity > variant.stock) issues.push("OUT_OF_STOCK");

@@ -2,7 +2,7 @@
 
 ## Phạm vi tuần 7
 
-Các endpoint tạo đơn/đơn của tôi bên dưới là hợp đồng cho tuần 9, chưa triển khai. Tuần 8 đã triển khai riêng `POST /api/checkout/check` để kiểm tra giá/tồn toàn giỏ. Giao diện checkout hiện vẫn xem trước, chưa nối endpoint kiểm tra toàn giỏ. Không dùng đơn seed trong Admin làm minh chứng khách đã đặt hàng.
+Backend tuần 9 đã triển khai API tạo đơn COD và API đọc đơn của khách. Đơn thật trong Admin có `source=checkout`. Tuần 8 đã triển khai `POST /api/checkout/check` để kiểm tra giá/tồn toàn giỏ. Checkout hiện là bản xem trước.
 
 ## Kiểm tra toàn giỏ — đã triển khai tuần 8
 
@@ -62,11 +62,11 @@ HTTP 400 `VALIDATION_ERROR`; HTTP 429 `TOO_MANY_REQUESTS`. Lỗi mạng/validati
 
 - userId lấy từ phiên đăng nhập. Client không được quyết định giá, giảm giá, phí vận chuyển, tổng tiền, trạng thái đơn, paymentStatus hoặc nguồn đơn.
 - Họ tên tối đa 100 ký tự; số điện thoại Việt Nam hợp lệ; email tùy chọn, tối đa 160 ký tự; addressLine từ 10 đến 250 ký tự; ghi chú tối đa 500 ký tự. Trim trước khi kiểm tra.
-- Mỗi dòng có productId hợp lệ, SKU thuộc đúng sản phẩm và quantity nguyên dương. Giới hạn 50 dòng; các dòng trùng productId/SKU được gộp rồi kiểm tra tổng lượng. Server từ chối trường lạ thay vì tin giá từ giỏ.
+- Mỗi dòng có productId hợp lệ, SKU thuộc đúng sản phẩm và quantity nguyên từ 1 đến 999. Giới hạn 50 dòng. Server gộp các dòng trùng productId/SKU trước khi kiểm tra tồn và so sánh nội dung gửi lại. Body và các object lồng nhau từ chối trường ngoài hợp đồng.
 - Chỉ nhận `cod` trong bản nghiệm thu tối thiểu. Tên phương thức chuyển khoản thống nhất là `bank_transfer`, thuộc phần mở rộng; giao diện xem trước hiện có lựa chọn này nhưng API tạo đơn COD phải từ chối phương thức chưa hỗ trợ.
-- Server kiểm tra product/category/brand đang bán, đọc giá hiệu lực và tồn theo SKU. Tính subtotal, shippingFee, discount, total tại server theo chính sách được công bố trước khi nối UI. Không dùng subtotal hoặc stock trong localStorage làm nguồn chính thức.
+- Server kiểm tra product/category/brand đang bán, đọc giá hiệu lực và tồn theo SKU. Bản COD này áp dụng phí vận chuyển và giảm giá bằng 0, nên tổng tiền bằng tiền hàng tính từ giá tại server.
 - Tạo đơn với source=`checkout`, pending/unpaid, lịch sử ban đầu; trừ tồn nguyên tử và lưu đơn trong transaction. Mỗi userId/Idempotency-Key là duy nhất; cùng khóa, cùng payload trả lại đơn cũ; cùng khóa khác payload trả 409.
-- Chọn cấu hình phí vận chuyển và giảm giá trong lần triển khai tuần 9; hợp đồng không cho phép client tự quyết định hai trường này.
+- Tạo đơn và hủy đơn có trừ tồn yêu cầu MongoDB hỗ trợ transaction (replica set hoặc cụm sharded). Khi admin hủy đơn COD đã trừ tồn, trạng thái hủy và hoàn tồn được ghi cùng transaction. Nếu SKU đã bị xóa hoặc đổi mã và không thể hoàn tồn, API trả 409 `RESTOCK_SKU_UNAVAILABLE`; cần khôi phục SKU trước khi hủy.
 
 Response tạo mới: HTTP 201; gửi lại khóa hợp lệ: HTTP 200. Cùng cấu trúc:
 
@@ -78,20 +78,20 @@ Response tạo mới: HTTP 201; gửi lại khóa hợp lệ: HTTP 200. Cùng c�
       "id": "<ObjectId đơn>", "orderCode": "<mã duy nhất>", "source": "checkout",
       "status": "pending", "paymentMethod": "cod", "paymentStatus": "unpaid",
       "items": [{ "productId": "<ObjectId sản phẩm>", "sku": "VT-SK190-BLK", "productName": "<tên snapshot>", "variantName": "<biến thể>", "unitPrice": 105000, "quantity": 2, "lineTotal": 210000 }],
-      "subtotal": 210000, "shippingFee": 30000, "discount": 0, "total": 240000
+      "subtotal": 210000, "shippingFee": 0, "discount": 0, "total": 210000
     },
     "replayed": false
   }
 }
 ```
 
-Số tiền trên là ví dụ cấu trúc, không phải cam kết phí ship. Response thực tế cần thêm customer, shippingAddress, customerNote, createdAt và các snapshot ảnh phục vụ trang chi tiết.
+Response còn có customer, shippingAddress, customerNote, createdAt, updatedAt và URL ảnh lưu theo từng dòng đơn.
 
 ## Trang thành công và Đơn của tôi
 
 Sau 201/200 đã xác nhận đơn, client chuyển đến `/orders/:orderId/success` và xóa các dòng đã được server chấp nhận. Không xóa giỏ khi timeout hoặc lỗi. Tải lại trang thành công phải đọc đơn qua API, không tin dữ liệu URL/localStorage.
 
-- `GET /api/customer/orders?page=1&limit=10`: cookie khách hàng; chỉ đơn userId hiện tại, source=checkout; pagination `{page,limit,total,totalPages}`.
+- `GET /api/customer/orders?page=1&limit=10`: cookie khách hàng; chỉ đơn userId hiện tại, source=checkout; pagination `{page,limit,total,totalPages}`. Giới hạn tối đa 50 đơn/trang.
 - `GET /api/customer/orders/:orderId`: chỉ đơn của chính khách hàng; không tồn tại hoặc thuộc người khác đều trả 404. Không trả adminNote hoặc thông tin quản trị nội bộ.
 - Danh sách `/my-orders` và chi tiết `/my-orders/:orderId` phải có loading, rỗng, lỗi và thử lại; kiểm tra login khi phiên hết hạn.
 

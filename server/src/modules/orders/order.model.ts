@@ -61,6 +61,8 @@ export interface Order {
   source?: "demo" | "checkout" | "legacy";
   orderCode: string;
   user?: Types.ObjectId | null;
+  idempotencyKey?: string;
+  requestHash?: string;
   customer: OrderCustomer;
   shippingAddress: OrderShippingAddress;
   items: OrderItem[];
@@ -144,6 +146,8 @@ const orderSchema = new Schema<Order, OrderModel>(
     source: { type: String, enum: ["demo", "checkout", "legacy"], default: "legacy", index: true },
     orderCode: { type: String, required: true, unique: true, trim: true, uppercase: true },
     user: { type: Schema.Types.ObjectId, ref: "User", default: null, index: true },
+    idempotencyKey: { type: String },
+    requestHash: { type: String },
     customer: { type: customerSchema, required: true },
     shippingAddress: { type: shippingAddressSchema, required: true },
     items: {
@@ -171,5 +175,10 @@ const orderSchema = new Schema<Order, OrderModel>(
 orderSchema.index({ status: 1, createdAt: -1 });
 orderSchema.index({ paymentStatus: 1, createdAt: -1 });
 orderSchema.index({ "customer.phone": 1 });
+orderSchema.index({ user: 1, source: 1, createdAt: -1, _id: -1 });
+orderSchema.index(
+  { user: 1, idempotencyKey: 1 },
+  { unique: true, partialFilterExpression: { idempotencyKey: { $type: "string" } } },
+);
 
 export const OrderModel = model<Order, OrderModel>("Order", orderSchema);
