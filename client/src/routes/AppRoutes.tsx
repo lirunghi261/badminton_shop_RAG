@@ -26,6 +26,9 @@ const CustomerAuthPage = lazy(() =>
 const CheckoutPage = lazy(() =>
   import("../pages/storefront/CheckoutPage").then((module) => ({ default: module.CheckoutPage })),
 );
+const OrderSuccessPage = lazy(() => import("../pages/storefront/OrderSuccessPage").then((module) => ({ default: module.OrderSuccessPage })));
+const MyOrdersPage = lazy(() => import("../pages/storefront/MyOrdersPage").then((module) => ({ default: module.MyOrdersPage })));
+const MyOrderDetailPage = lazy(() => import("../pages/storefront/MyOrderDetailPage").then((module) => ({ default: module.MyOrderDetailPage })));
 const AdminLoginPage = lazy(() => import("../pages/admin/LoginPage").then((module) => ({ default: module.LoginPage })));
 const DashboardPage = lazy(() => import("../pages/admin/DashboardPage").then((module) => ({ default: module.DashboardPage })));
 const ProductManagementPage = lazy(() =>
@@ -56,7 +59,10 @@ export function AppRoutes() {
           <Route path="ai-advisor" element={<AiAdvisorPage />} />
           <Route path="cart" element={<CartPage />} />
           <Route path="checkout" element={<CheckoutPage />} />
+          <Route path="order-success/:orderId" element={<OrderSuccessPage />} />
           <Route path="account" element={<AccountPage />} />
+          <Route path="account/orders" element={<MyOrdersPage />} />
+          <Route path="account/orders/:orderId" element={<MyOrderDetailPage />} />
           <Route path="login" element={<CustomerAuthPage mode="login" />} />
           <Route path="register" element={<CustomerAuthPage mode="register" />} />
         </Route>

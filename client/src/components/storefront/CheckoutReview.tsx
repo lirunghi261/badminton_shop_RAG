@@ -2,9 +2,9 @@ import { EditOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { Alert, Button, Card, Descriptions } from "antd";
 import type { CheckoutFormValues } from "./CheckoutCustomerForm";
 
-interface CheckoutReviewProps { values: CheckoutFormValues; onEdit: () => void; }
+interface CheckoutReviewProps { values: CheckoutFormValues; onEdit: () => void; onConfirm: () => void; submitting?: boolean; error?: string; }
 
-export function CheckoutReview({ values, onEdit }: CheckoutReviewProps) {
+export function CheckoutReview({ values, onEdit, onConfirm, submitting = false, error }: CheckoutReviewProps) {
   return (
     <div className="store-checkout-review">
       <Card className="store-checkout-card" title="Xác nhận thông tin" extra={<Button type="link" icon={<EditOutlined />} onClick={onEdit}>Sửa thông tin</Button>}>
@@ -17,8 +17,8 @@ export function CheckoutReview({ values, onEdit }: CheckoutReviewProps) {
           {values.note && <Descriptions.Item label="Ghi chú">{values.note}</Descriptions.Item>}
         </Descriptions>
       </Card>
-      <Alert className="store-checkout-contract-notice" type="info" showIcon icon={<InfoCircleOutlined />} message="Chưa thể tạo đơn hàng" description="Backend chưa có API tạo đơn và thanh toán. Thông tin của bạn chỉ được giữ trong phiên checkout này, chưa được gửi hoặc lưu trữ." />
-      <Button className="store-checkout-next" type="primary" size="large" disabled>Tạo đơn hàng</Button>
+      {error ? <Alert className="store-checkout-contract-notice" type="error" showIcon message="Không thể tạo đơn hàng" description={error} /> : <Alert className="store-checkout-contract-notice" type="info" showIcon icon={<InfoCircleOutlined />} message="Sẵn sàng tạo đơn hàng" description="Giá và tồn kho sẽ được kiểm tra lại lần cuối khi xác nhận." />}
+      <Button className="store-checkout-next" type="primary" size="large" loading={submitting} onClick={onConfirm}>Xác nhận đặt hàng</Button>
     </div>
   );
 }

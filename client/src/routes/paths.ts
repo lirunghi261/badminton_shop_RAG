@@ -8,7 +8,10 @@ export const paths = {
   aiAdvisor: "/ai-advisor",
   cart: "/cart",
   checkout: "/checkout",
+  orderSuccess: (orderId: string) => `/order-success/${orderId}`,
   account: "/account",
+  myOrders: "/account/orders",
+  myOrderDetail: (orderId: string) => `/account/orders/${orderId}`,
   login: "/login",
   register: "/register",
   admin: {

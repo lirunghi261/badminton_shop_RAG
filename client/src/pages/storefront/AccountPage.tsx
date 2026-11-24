@@ -1,7 +1,7 @@
 import { LogoutOutlined, MailOutlined, PhoneOutlined, SafetyCertificateOutlined, UserOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Alert, Avatar, Button, Card, Descriptions, Skeleton, Space, Typography } from "antd";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useEffect } from "react";
 import { getCurrentCustomer, logoutUser } from "../../api/auth/auth.api";
@@ -82,9 +82,8 @@ export function AccountPage() {
             <Card className="store-orders-preview">
               <span className="store-account-icon"><SafetyCertificateOutlined /></span>
               <Typography.Title level={3}>Đơn hàng của tôi</Typography.Title>
-              <Typography.Paragraph type="secondary">
-                Tài khoản đã sẵn sàng. Danh sách đơn sẽ được nối ở bước triển khai checkout phía người dùng.
-              </Typography.Paragraph>
+              <Typography.Paragraph type="secondary">Theo dõi trạng thái và xem lại chi tiết các đơn hàng đã đặt.</Typography.Paragraph>
+              <Link to={paths.myOrders}><Button type="primary">Xem đơn hàng của tôi</Button></Link>
             </Card>
           </div>
         )}

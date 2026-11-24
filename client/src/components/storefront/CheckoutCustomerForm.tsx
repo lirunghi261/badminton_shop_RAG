@@ -1,4 +1,4 @@
-import { BankOutlined, PhoneOutlined, TruckOutlined } from "@ant-design/icons";
+import { PhoneOutlined, TruckOutlined } from "@ant-design/icons";
 import { Button, Card, Col, Form, Input, Radio, Row } from "antd";
 
 export interface CheckoutFormValues {
@@ -7,7 +7,7 @@ export interface CheckoutFormValues {
   email?: string;
   address: string;
   note?: string;
-  paymentMethod: "cod" | "bank_transfer";
+  paymentMethod: "cod";
 }
 
 interface CheckoutCustomerFormProps { onFinish: (values: CheckoutFormValues) => void; initialValues?: CheckoutFormValues; }
@@ -28,7 +28,6 @@ export function CheckoutCustomerForm({ onFinish, initialValues }: CheckoutCustom
         <Form.Item name="paymentMethod" noStyle>
           <Radio.Group className="store-payment-options" name="paymentMethod">
             <Radio value="cod"><span><TruckOutlined /><strong>Thanh toán khi nhận hàng</strong><small>Thanh toán cho nhân viên giao hàng.</small></span></Radio>
-            <Radio value="bank_transfer"><span><BankOutlined /><strong>Chuyển khoản ngân hàng</strong><small>Thông tin thanh toán sẽ hiển thị sau khi đơn được tạo.</small></span></Radio>
           </Radio.Group>
         </Form.Item>
       </Card>
