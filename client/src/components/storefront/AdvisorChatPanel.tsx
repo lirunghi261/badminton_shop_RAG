@@ -1,5 +1,6 @@
 import {
   ArrowRightOutlined,
+  BookOutlined,
   CheckCircleFilled,
   PictureOutlined,
   RobotOutlined,
@@ -20,6 +21,7 @@ interface ChatMessage {
   role: "assistant" | "user";
   content: string;
   products?: StorefrontProduct[];
+  source?: { title: string; detail: string };
 }
 
 interface AdvisorChatPanelProps {
@@ -82,7 +84,7 @@ export function AdvisorChatPanel({ products }: AdvisorChatPanelProps) {
     setMessages((current) => [
       ...current,
       { id: messageId, role: "user", content: question },
-      { id: messageId + 1, role: "assistant", content: reply.message, products: reply.products },
+      { id: messageId + 1, role: "assistant", content: reply.message, products: reply.products, source: reply.source },
     ]);
     setValue("");
   };
@@ -112,6 +114,12 @@ export function AdvisorChatPanel({ products }: AdvisorChatPanelProps) {
                     <AdvisorProductResult product={product} key={product.id} />
                   ))}
                 </div>
+              ) : null}
+              {message.source ? (
+                <section className="advisor-answer-source" aria-label="Nguồn gợi ý sản phẩm">
+                  <BookOutlined aria-hidden="true" />
+                  <div><strong>Nguồn: {message.source.title}</strong><span>{message.source.detail}</span></div>
+                </section>
               ) : null}
             </div>
           </article>

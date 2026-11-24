@@ -29,6 +29,11 @@
 .advisor-chat-message.user .advisor-message-content { display: flex; flex-direction: column; align-items: flex-end; }
 .advisor-chat-message.user p { border-color: var(--ocean-700); border-radius: 13px 4px 13px 13px; background: var(--ocean-700); color: #fff; }
 .advisor-products { display: grid; gap: 8px; margin-top: 10px; }
+.advisor-answer-source { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 8px; margin-top: 10px; padding: 9px 10px; border: 1px solid #cfe2eb; border-radius: 10px; background: #f1f8fb; color: #4e6b7e; }
+.advisor-answer-source > .anticon { padding-top: 2px; color: var(--ocean-700); font-size: 14px; }
+.advisor-answer-source div { display: grid; gap: 2px; }
+.advisor-answer-source strong { color: #17445f; font-size: 10px; }
+.advisor-answer-source span { font-size: 10px; line-height: 1.5; }
 .advisor-product-result { min-height: 66px; display: grid; grid-template-columns: 52px minmax(0,1fr) auto; align-items: center; gap: 10px; padding: 7px 10px 7px 7px; border: 1px solid var(--line); border-radius: 11px; background: #fff; color: #173c55; text-decoration: none; }
 .advisor-product-result:hover { border-color: #a7cada; color: #173c55; transform: translateY(-1px); }
 .advisor-product-image { width: 52px; height: 52px; display: grid; place-items: center; overflow: hidden; border-radius: 8px; background: #f0f6f9; color: #8dbbd5; }
@@ -65,6 +70,10 @@
 .advisor-guide li strong { color: #173c55; font-size: 12px; }
 .advisor-guide li small { color: #7b91a2; font-size: 10px; line-height: 1.5; }
 .advisor-guide > a { color: var(--ocean-700); font-size: 11px; font-weight: 750; text-decoration: none; }
+.advisor-question-library { margin: 0 0 20px; color: #587487; font-size: 11px; }
+.advisor-question-library summary { color: var(--ocean-700); cursor: pointer; font-weight: 750; }
+.advisor-question-library ul { display: grid; gap: 8px; margin: 10px 0 0; padding-left: 17px; }
+.advisor-question-library li { padding-left: 1px; line-height: 1.5; }
 
 @media (max-width: 900px) {
   .advisor-workspace { grid-template-columns: 1fr; }

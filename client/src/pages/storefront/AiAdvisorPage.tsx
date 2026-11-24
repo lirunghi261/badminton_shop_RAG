@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import { getStorefrontProducts } from "../../api/storefront/products.api";
 import { SeoHead } from "../../components/common/SeoHead";
 import { AdvisorChatPanel } from "../../components/storefront/AdvisorChatPanel";
+import { advisorShoppingQuestions } from "../../components/storefront/advisorPrompts";
 import { paths } from "../../routes/paths";
 import "../../styles/ai-advisor.css";
 
@@ -69,6 +70,10 @@ export function AiAdvisorPage() {
                   </li>
                 ))}
               </ol>
+              <details className="advisor-question-library">
+                <summary>Câu hỏi thực tế để bắt đầu</summary>
+                <ul>{advisorShoppingQuestions.map((question) => <li key={question}>{question}</li>)}</ul>
+              </details>
               <Link to={paths.products}>Tự khám phá toàn bộ sản phẩm →</Link>
             </aside>
           </div>
