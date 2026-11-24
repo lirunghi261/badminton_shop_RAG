@@ -154,6 +154,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
       addProduct, updateQuantity, refreshCart,
       removeItem: (key) => replaceItems(latestItems.current.filter((item) => item.key !== key)),
       clearCart: () => replaceItems([]),
+      removePurchasedItems: (purchased) => {
+        const quantities = new Map(purchased.map((item) => [`${item.productId}:${item.sku}`, item.quantity]));
+        replaceItems(latestItems.current.flatMap((item) => {
+          const quantity = item.quantity - (quantities.get(item.key) ?? 0);
+          return quantity > 0 ? [{ ...item, quantity }] : [];
+        }));
+      },
       acceptPrices: () => replaceItems(latestItems.current.map((item) => ({ ...item, priceChanged: false }))),
     };
   }, [items, isSyncing, syncError, refreshCart, replaceItems]);

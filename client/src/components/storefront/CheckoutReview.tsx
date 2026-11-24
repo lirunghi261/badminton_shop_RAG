@@ -2,12 +2,12 @@ import { EditOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { Alert, Button, Card, Descriptions } from "antd";
 import type { CheckoutFormValues } from "./CheckoutCustomerForm";
 
-interface CheckoutReviewProps { values: CheckoutFormValues; onEdit: () => void; onConfirm: () => void; submitting?: boolean; error?: string; }
+interface CheckoutReviewProps { values: CheckoutFormValues; onEdit?: () => void; onConfirm: () => void; submitting?: boolean; error?: string; locked?: boolean; }
 
-export function CheckoutReview({ values, onEdit, onConfirm, submitting = false, error }: CheckoutReviewProps) {
+export function CheckoutReview({ values, onEdit, onConfirm, submitting = false, error, locked = false }: CheckoutReviewProps) {
   return (
     <div className="store-checkout-review">
-      <Card className="store-checkout-card" title="Xác nhận thông tin" extra={<Button type="link" icon={<EditOutlined />} onClick={onEdit}>Sửa thông tin</Button>}>
+      <Card className="store-checkout-card" title="Xác nhận thông tin" extra={<Button type="link" icon={<EditOutlined />} onClick={onEdit} disabled={locked || submitting}>Sửa thông tin</Button>}>
         <Descriptions column={1} size="small">
           <Descriptions.Item label="Người nhận">{values.fullName}</Descriptions.Item>
           <Descriptions.Item label="Số điện thoại">{values.phone}</Descriptions.Item>

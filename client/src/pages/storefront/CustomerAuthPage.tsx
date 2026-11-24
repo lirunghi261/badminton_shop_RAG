@@ -54,7 +54,9 @@ export function CustomerAuthPage({ mode }: { mode: AuthMode }) {
     if (axios.isAxiosError(error) && [401, 403].includes(error.response?.status ?? 0)) clearCustomerSession();
   }, [currentUserQuery.error]);
 
-  const finishAuthentication = (user: CustomerUser) => {
+  const finishAuthentication = async (user: CustomerUser) => {
+    await queryClient.cancelQueries({ queryKey: ["customer-orders"] });
+    queryClient.removeQueries({ queryKey: ["customer-orders"] });
     saveCustomerSession(user);
     queryClient.setQueryData(currentCustomerQueryKey, user);
     const requestedPath = (location.state as { from?: string } | null)?.from;

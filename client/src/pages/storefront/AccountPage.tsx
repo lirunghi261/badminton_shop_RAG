@@ -21,8 +21,10 @@ export function AccountPage() {
   });
   const logoutMutation = useMutation({
     mutationFn: logoutUser,
-    onSuccess: () => {
+    onSuccess: async () => {
       clearCustomerSession();
+      await queryClient.cancelQueries({ queryKey: ["customer-orders"] });
+      queryClient.removeQueries({ queryKey: ["customer-orders"] });
       queryClient.setQueryData(currentCustomerQueryKey, null);
       navigate(paths.login, { replace: true });
     },

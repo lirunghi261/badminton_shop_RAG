@@ -1,0 +1,86 @@
+{
+  "date": "2026-11-24",
+  "baseCommit": "95404c3",
+  "scope": "Nguyễn Phát Khang – Tuần 09",
+  "regression": {
+    "mode": "Chromium, mocked API",
+    "passed": 8,
+    "results": [
+      {
+        "name": "Happy path COD and success reload",
+        "evidence": {
+          "successPage": true,
+          "cleared": true,
+          "reload": true
+        }
+      },
+      {
+        "name": "List API error becomes empty orders",
+        "evidence": {
+          "errorShown": true,
+          "retryRecovers": true
+        }
+      },
+      {
+        "name": "Cache reveals previous account detail",
+        "evidence": {
+          "otherAccountDataHidden": true,
+          "foreignDetailRejected": true
+        }
+      },
+      {
+        "name": "Network error then edit payload reuses key",
+        "evidence": {
+          "reloadRetainsRequest": true,
+          "sameKey": true,
+          "samePayload": true
+        }
+      },
+      {
+        "name": "Another tab adds cart line during order then entire cart clears",
+        "evidence": {
+          "submittedLines": 1,
+          "newLinePreserved": true
+        }
+      },
+      {
+        "name": "Definite rejection permits correcting address with a new key",
+        "evidence": {
+          "correctedSuccessfully": true,
+          "newKey": true
+        }
+      },
+      {
+        "name": "Expired session on orders returns to login",
+        "evidence": {
+          "loginShown": true
+        }
+      },
+      {
+        "name": "Extra quantity of same SKU from another tab survives",
+        "evidence": {
+          "purchased": 1,
+          "added": 2,
+          "remaining": 2
+        }
+      }
+    ]
+  },
+  "endToEnd": {
+    "mode": "Chromium + Express + MongoDB replica set local",
+    "passed": 7,
+    "results": [
+      "COD thật đi từ UI đến MongoDB, trừ tồn và xóa đúng giỏ; tải lại trang thành công đọc lại API",
+      "Admin đọc được đơn COD do khách tạo",
+      "Lịch sử và chi tiết đọc đúng đơn của khách",
+      "Mất phản hồi sau khi DB đã tạo đơn, tải lại rồi gửi lại cùng khóa nhận đơn cũ và tồn không giảm thêm",
+      "Đủ nhãn trạng thái processing và refunded từ API",
+      "Đổi tài khoản A sang B không hiển thị cache của A và backend chặn đơn không thuộc B",
+      "Trang lịch sử rỗng dùng được trên màn hình 390px, không tràn ngang"
+    ]
+  },
+  "checks": {
+    "lint": "passed",
+    "build": "passed"
+  }
+}
