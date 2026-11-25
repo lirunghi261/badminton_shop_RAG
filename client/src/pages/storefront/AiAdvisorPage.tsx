@@ -4,7 +4,7 @@ import {
   RobotOutlined,
   ThunderboltOutlined,
 } from "@ant-design/icons";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Alert, Button, Card, Skeleton } from "antd";
 import { Link } from "react-router-dom";
 import { getStorefrontProducts } from "../../api/storefront/products.api";
@@ -20,10 +20,18 @@ const advisorGuide = [
 ];
 
 export function AiAdvisorPage() {
+  const queryClient = useQueryClient();
+  const fetchAdvisorProducts = () => getStorefrontProducts({ page: 1, limit: 48, search: "", category: "all", brand: "all", sort: "newest" });
   const productsQuery = useQuery({
     queryKey: ["storefront", "advisor-products"],
-    queryFn: () => getStorefrontProducts({ page: 1, limit: 48, search: "", category: "all", brand: "all", sort: "newest" }),
+    queryFn: fetchAdvisorProducts,
   });
+
+  const refreshAdvisorProducts = async () => {
+    const catalog = await fetchAdvisorProducts();
+    queryClient.setQueryData(["storefront", "advisor-products"], catalog);
+    return catalog.products;
+  };
 
   return (
     <section className="store-advisor-page">
@@ -56,7 +64,7 @@ export function AiAdvisorPage() {
 
         {productsQuery.data ? (
           <div className="advisor-workspace">
-            <AdvisorChatPanel products={productsQuery.data.products} />
+            <AdvisorChatPanel onRefreshCatalog={refreshAdvisorProducts} />
             <aside className="advisor-guide" aria-labelledby="advisor-guide-title">
               <span className="advisor-guide-kicker">Mẹo hỏi hiệu quả</span>
               <h2 id="advisor-guide-title">Càng cụ thể,<br />gợi ý càng sát</h2>

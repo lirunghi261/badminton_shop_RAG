@@ -50,6 +50,7 @@
 .advisor-suggestions button { flex: 0 0 auto; padding: 6px 10px; border: 1px solid #cce2ef; border-radius: 8px; background: #fff; color: var(--ocean-700); cursor: pointer; font: inherit; font-size: 10px; font-weight: 650; }
 .advisor-suggestions button:hover,
 .advisor-suggestions button:focus-visible { border-color: var(--ocean-500); background: var(--ocean-50); }
+.advisor-suggestions button:disabled { cursor: wait; opacity: .6; }
 .advisor-chat-input { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 9px; }
 .advisor-chat-input .ant-input { min-height: 44px; padding: 11px 13px; border-color: #cbdfea; border-radius: 10px; resize: none; }
 .advisor-chat-input .ant-btn { height: 44px; padding-inline: 16px; border-radius: 10px; font-size: 12px; font-weight: 700; }

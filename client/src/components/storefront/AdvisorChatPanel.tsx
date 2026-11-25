@@ -23,7 +23,7 @@ interface ChatMessage {
 }
 
 interface AdvisorChatPanelProps {
-  products: StorefrontProduct[];
+  onRefreshCatalog: () => Promise<StorefrontProduct[]>;
 }
 
 function AdvisorProductResult({ product }: { product: StorefrontProduct }) {
@@ -57,8 +57,9 @@ function AdvisorProductResult({ product }: { product: StorefrontProduct }) {
   );
 }
 
-export function AdvisorChatPanel({ products }: AdvisorChatPanelProps) {
+export function AdvisorChatPanel({ onRefreshCatalog }: AdvisorChatPanelProps) {
   const [value, setValue] = useState("");
+  const [isRefreshingCatalog, setIsRefreshingCatalog] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 0,
@@ -73,18 +74,33 @@ export function AdvisorChatPanel({ products }: AdvisorChatPanelProps) {
     messagesRef.current?.scrollTo({ top: messagesRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
 
-  const send = (nextValue = value) => {
+  const send = async (nextValue = value) => {
     const question = nextValue.trim();
-    if (!question) return;
-    const reply = createAdvisorReply(question, products);
+    if (!question || isRefreshingCatalog) return;
     const messageId = nextMessageId.current;
     nextMessageId.current += 2;
-    setMessages((current) => [
-      ...current,
-      { id: messageId, role: "user", content: question },
-      { id: messageId + 1, role: "assistant", content: reply.message, products: reply.products },
-    ]);
     setValue("");
+    setMessages((current) => [...current, { id: messageId, role: "user", content: question }]);
+    setIsRefreshingCatalog(true);
+    try {
+      const freshProducts = await onRefreshCatalog();
+      const reply = createAdvisorReply(question, freshProducts);
+      setMessages((current) => [
+        ...current,
+        { id: messageId + 1, role: "assistant", content: reply.message, products: reply.products },
+      ]);
+    } catch {
+      setMessages((current) => [
+        ...current,
+        {
+          id: messageId + 1,
+          role: "assistant",
+          content: "Mình chưa cập nhật được catalog mới nhất nên chưa thể đưa ra gợi ý đáng tin cậy. Bạn hãy thử lại sau ít phút.",
+        },
+      ]);
+    } finally {
+      setIsRefreshingCatalog(false);
+    }
   };
 
   return (
@@ -93,7 +109,7 @@ export function AdvisorChatPanel({ products }: AdvisorChatPanelProps) {
         <span className="advisor-chat-avatar"><RobotOutlined /></span>
         <div>
           <h2>Trợ lý chọn dụng cụ</h2>
-          <p><i aria-hidden="true" /> Sẵn sàng tra cứu catalog</p>
+          <p><i aria-hidden="true" /> Tra cứu catalog và tồn kho mới nhất</p>
         </div>
         <Tag icon={<CheckCircleFilled />}>Catalog đã kết nối</Tag>
       </header>
@@ -122,7 +138,7 @@ export function AdvisorChatPanel({ products }: AdvisorChatPanelProps) {
         <span className="advisor-suggestion-label">Thử hỏi nhanh</span>
         <div className="advisor-suggestions">
           {advisorSuggestions.map((suggestion) => (
-            <button type="button" key={suggestion} onClick={() => send(suggestion)}>
+            <button type="button" key={suggestion} disabled={isRefreshingCatalog} onClick={() => void send(suggestion)}>
               {suggestion}
             </button>
           ))}
@@ -138,17 +154,17 @@ export function AdvisorChatPanel({ products }: AdvisorChatPanelProps) {
             onPressEnter={(event) => {
               if (event.shiftKey) return;
               event.preventDefault();
-              send();
+              void send();
             }}
             placeholder="Ví dụ: Tôi mới chơi, cần vợt dễ thuần dưới 2 triệu…"
             aria-label="Nhu cầu tư vấn sản phẩm"
           />
-          <Button type="primary" icon={<SendOutlined />} disabled={!value.trim()} onClick={() => send()}>
-            Gửi câu hỏi
+          <Button type="primary" icon={<SendOutlined />} loading={isRefreshingCatalog} disabled={!value.trim() || isRefreshingCatalog} onClick={() => void send()}>
+            {isRefreshingCatalog ? "Đang cập nhật" : "Gửi câu hỏi"}
           </Button>
         </div>
         <p className="advisor-chat-disclaimer">
-          Bản thử nghiệm đang đối chiếu từ khóa với catalog, chưa sử dụng mô hình RAG. Bạn nên kiểm tra thông số ở trang chi tiết trước khi mua.
+          Mỗi câu hỏi đều đọc lại catalog để gợi ý theo tồn kho hiện có. Bản thử nghiệm đang đối chiếu từ khóa, chưa sử dụng mô hình RAG. Giá và tồn kho cuối cùng vẫn được server kiểm tra ở giỏ hàng và checkout.
         </p>
       </footer>
     </Card>
