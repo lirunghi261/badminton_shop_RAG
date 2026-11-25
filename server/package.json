@@ -4,8 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "test:week-10": "npm run build && node --test tests/week-10.integration.mjs",
     "test:week-09": "npm run build && node --test tests/week-09.integration.mjs",
     "test:week-08": "npm run build && node tests/week-08.integration.mjs",
+    "catalog:export": "npm run build --silent && node dist/scripts/exportCatalog.js",
     "rag:plan": "tsx src/scripts/planRagSync.ts",
     "test:week-07": "npm run build && node tests/week-07.integration.mjs",
     "test:weeks-01-04": "npm run build && node tests/weeks-01-04.integration.mjs",

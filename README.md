@@ -151,6 +151,7 @@ npm run dev         # Chạy client và server
 npm run build       # Kiểm tra TypeScript và build production
 npm run lint        # Chạy kiểm tra tĩnh
 npm run test:week-08 # Kiểm thử customer auth, kiểm tra giỏ và schema/đồng bộ RAG
+npm run catalog:export -- --output catalog.json
 npm run rag:plan -- --output ../docs/evidence/rag-plan.json # Xuất kế hoạch RAG, không ghi index
 npm run seed:admin  # Tạo/cập nhật tài khoản admin từ server/.env
 npm run seed:catalog # Upsert danh mục và thương hiệu cầu lông mẫu
@@ -160,6 +161,9 @@ npm run seed:products # Thêm bộ sản phẩm mẫu và lưu ảnh vào MongoD
 `seed:products` dùng tên, giá và ảnh công khai tại ShopVNB làm dữ liệu tham khảo; phần mô tả được
 viết lại cho dự án. Script có thể chạy lại an toàn: sản phẩm đã tồn tại theo `slug` sẽ được bỏ qua,
 không tạo bản ghi hoặc ảnh trùng.
+
+`catalog:export` đọc các sản phẩm công khai qua `MONGODB_URI` trong `server/.env` và tạo bản catalog phục vụ chuẩn bị dữ liệu RAG.
+Thư mục chứa file đầu ra cần tồn tại. Xem [cách dùng và kiểm chứng bản xuất](docs/week-10-thien-verification.md).
 
 ## Quy tắc bảo mật
 
