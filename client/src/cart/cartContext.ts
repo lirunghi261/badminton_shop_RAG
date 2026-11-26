@@ -36,6 +36,7 @@ export interface CartContextValue {
   updateQuantity: (key: string, quantity: number) => void;
   removeItem: (key: string) => void;
   clearCart: () => void;
+  removePurchasedItems: (purchased: Array<{ productId: string; sku: string; quantity: number }>) => void;
   refreshCart: () => Promise<boolean>;
   acceptPrices: () => void;
 }

@@ -2,7 +2,7 @@
 
 ## Phạm vi tuần 7
 
-Backend tuần 9 đã triển khai API tạo đơn COD và API đọc đơn của khách. Đơn thật trong Admin có `source=checkout`. Tuần 8 đã triển khai `POST /api/checkout/check` để kiểm tra giá/tồn toàn giỏ. Checkout hiện là bản xem trước.
+Backend tuần 9 đã triển khai API tạo đơn COD và API đọc đơn của khách. Storefront đã nối checkout, trang xác nhận, danh sách và chi tiết đơn. Đơn tạo từ checkout có `source=checkout`. Tuần 8 đã triển khai `POST /api/checkout/check` để kiểm tra giá/tồn toàn giỏ.
 
 Storefront gọi API khi mở hoặc cập nhật giỏ, khi chuyển sang checkout, khi mở trực tiếp checkout và trước bước xem lại đơn.
 
@@ -93,11 +93,14 @@ Response còn có customer, shippingAddress, customerNote, createdAt, updatedAt 
 
 ## Trang thành công và Đơn của tôi
 
-Sau 201/200 đã xác nhận đơn, client chuyển đến `/orders/:orderId/success` và xóa các dòng đã được server chấp nhận. Không xóa giỏ khi timeout hoặc lỗi. Tải lại trang thành công phải đọc đơn qua API, không tin dữ liệu URL/localStorage.
+Sau HTTP 201/200, client chuyển đến `/order-success/:orderId` và trừ lượng đã đặt khỏi giỏ. Sản phẩm mới hoặc lượng được thêm trong lúc gửi đơn được giữ lại. Tải lại trang thành công đọc đơn qua API.
+
+Client lưu yêu cầu đang chờ trong sessionStorage theo tài khoản, gồm nội dung gửi và Idempotency-Key. Sau lỗi mạng hoặc phản hồi chưa xác định, nút xác nhận gửi lại đúng nội dung và khóa, kể cả khi tải lại trang. Thông tin nhận hàng được khóa trong thời gian này. Khi server từ chối rõ ràng bằng validation hoặc lỗi hàng không khả dụng, client cho phép sửa thông tin và tạo yêu cầu mới với khóa mới. Giỏ được giữ khi xảy ra lỗi.
 
 - `GET /api/customer/orders?page=1&limit=10`: cookie khách hàng; chỉ đơn userId hiện tại, source=checkout; pagination `{page,limit,total,totalPages}`. Giới hạn tối đa 50 đơn/trang.
 - `GET /api/customer/orders/:orderId`: chỉ đơn của chính khách hàng; không tồn tại hoặc thuộc người khác đều trả 404. Không trả adminNote hoặc thông tin quản trị nội bộ.
-- Danh sách `/my-orders` và chi tiết `/my-orders/:orderId` phải có loading, rỗng, lỗi và thử lại; kiểm tra login khi phiên hết hạn.
+- Danh sách `/account/orders` và chi tiết `/account/orders/:orderId` có loading, rỗng, lỗi và thử lại. Phiên hết hạn chuyển tới đăng nhập và ghi nhớ đường dẫn quay lại.
+- Cache đơn tách theo tài khoản và loại dữ liệu riêng tư khi đăng xuất/đăng nhập. Trang thành công, danh sách và chi tiết xác thực chủ tài khoản qua API.
 
 ## Lỗi và kiểm thử bắt buộc khi triển khai
 

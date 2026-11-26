@@ -56,6 +56,7 @@ Context truy xuất là dữ liệu không tin cậy, không được thực thi
 - Nếu giá đổi, khách xem giá mới rồi xác nhận bằng cách bấm lại; nếu sản phẩm ngừng bán, SKU hết hàng hoặc giỏ đã đạt tồn kho, không thêm vào giỏ. Lỗi kết nối cũng không làm thay đổi giỏ.
 - Cả khách vãng lai và khách đăng nhập dùng giỏ hiện có trên cùng trình duyệt, lưu bằng localStorage; không đồng bộ theo tài khoản. Mỗi lần thêm từ chatbot thêm một đơn vị của SKU được chọn. Dữ liệu này không giữ chỗ trong kho.
 - Kiểm tra từ chatbot chỉ áp dụng cho SKU đang thêm, không rà soát toàn giỏ. Checkout hiện là bản xem trước. Việc kiểm tra toàn giỏ ngay trước đặt hàng và quyết định giá/tồn cuối cùng thuộc luồng Storefront/Backend, theo [hợp đồng checkout](checkout-api.md).
+- Từ tuần 9, trước mỗi câu trả lời theo từ khóa, UI đọc lại catalog công khai để loại gợi ý đã hết hàng sau khi tồn kho thay đổi. Nếu không đọc được catalog mới, UI không dùng dữ liệu cũ để gợi ý. Đây là đồng bộ hiển thị, không phải giữ chỗ hay quyết định tồn kho cuối cùng.
 
 Đang chờ: khóa gửi trùng, có thể hủy request; lỗi provider/Atlas: hiện nút thử lại, không thay bằng câu trả lời giả. HTTP 400 validation; 429 rate limit; 503 provider/index chưa sẵn sàng; 504 timeout. Envelope giống API hiện có: `{success:false,error:{code,message}}`. Không lộ prompt nội bộ hoặc secret trong response/log.
 

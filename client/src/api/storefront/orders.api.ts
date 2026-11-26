@@ -1,7 +1,7 @@
 import { http } from "../core/http";
 
-export type CustomerOrderStatus = "pending" | "confirmed" | "shipping" | "completed" | "cancelled";
-export type CustomerPaymentStatus = "unpaid" | "paid" | "refunded";
+export type CustomerOrderStatus = "pending" | "confirmed" | "processing" | "shipping" | "completed" | "cancelled";
+export type CustomerPaymentStatus = "unpaid" | "pending" | "paid" | "failed" | "refunded";
 
 export interface CustomerOrder {
   id: string;
