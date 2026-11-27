@@ -81,14 +81,6 @@ export function AdvisorChatPanel({ onRefreshCatalog }: AdvisorChatPanelProps) {
     if (!question || isRefreshingCatalog) return;
     const messageId = nextMessageId.current;
     nextMessageId.current += 2;
-<<<<<<< HEAD
-    setMessages((current) => [
-      ...current,
-      { id: messageId, role: "user", content: question },
-      { id: messageId + 1, role: "assistant", content: reply.message, products: reply.products, source: reply.source },
-    ]);
-=======
->>>>>>> NguyenNgocThien_24TX810071
     setValue("");
     setMessages((current) => [...current, { id: messageId, role: "user", content: question }]);
     setIsRefreshingCatalog(true);
@@ -97,7 +89,7 @@ export function AdvisorChatPanel({ onRefreshCatalog }: AdvisorChatPanelProps) {
       const reply = createAdvisorReply(question, freshProducts);
       setMessages((current) => [
         ...current,
-        { id: messageId + 1, role: "assistant", content: reply.message, products: reply.products },
+        { id: messageId + 1, role: "assistant", content: reply.message, products: reply.products, source: reply.source },
       ]);
     } catch {
       setMessages((current) => [

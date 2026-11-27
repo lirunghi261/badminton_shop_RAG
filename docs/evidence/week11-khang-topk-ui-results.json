@@ -1,0 +1,98 @@
+{
+  "date": "2026-11-26",
+  "scope": "Nguyễn Phát Khang – Tuần 11",
+  "baseCommit": "c23c48b",
+  "implementation": {
+    "retrieval": "deterministic catalog keyword matcher (prototype; not vector search/LLM)",
+    "topK": 3,
+    "filters": ["category", "brand", "maximum starting price", "total stock > 0"],
+    "sourceLabel": "Catalog Badminton Shop"
+  },
+  "staticChecks": {
+    "command": "npm run test:week-11",
+    "passed": 8,
+    "total": 8,
+    "results": [
+      "No unresolved merge markers",
+      "Assistant source is propagated to the message",
+      "Result card uses paths.productDetail(product.slug)",
+      "Product detail route products/:slug is registered",
+      "Top-k is capped at three products",
+      "Out-of-stock products are excluded from ranking",
+      "Add-to-cart revalidates the live product",
+      "Add-to-cart verifies identity, SKU, stock, and price"
+    ]
+  },
+  "manualCases": [
+    {
+      "id": "M01",
+      "question": "Yonex vợt dưới 1,5 triệu",
+      "result": "Correct",
+      "evidence": "Brand, category, maximum price and in-stock filters are applied."
+    },
+    {
+      "id": "M02",
+      "question": "Đánh đôi, cần vợt phản tạt dưới 1,5 triệu",
+      "result": "Partial",
+      "evidence": "The prototype handles the racket and price terms but does not understand the playing-style intent."
+    },
+    {
+      "id": "M03",
+      "question": "Yonex overgrip dưới 50 nghìn",
+      "result": "Correct",
+      "evidence": "Brand/category/price filters leave matching in-stock accessories."
+    },
+    {
+      "id": "M04",
+      "question": "Giày Yonex size 42 dưới 1,8 triệu",
+      "result": "Partial",
+      "evidence": "Brand/category/price work; size is not used as a variant filter until the user selects a SKU."
+    },
+    {
+      "id": "M05",
+      "question": "Aerosensa 30 còn hàng không?",
+      "result": "Partial",
+      "evidence": "Out-of-stock items are excluded, but the prototype does not explain the exact unavailable SKU."
+    },
+    {
+      "id": "M06",
+      "question": "So sánh Mavis 350 và Aerosensa 30",
+      "result": "Partial",
+      "evidence": "The matcher can surface terms but has no dedicated comparison response."
+    },
+    {
+      "id": "M07",
+      "question": "Mã sản phẩm không tồn tại XYZ-404",
+      "result": "Fail",
+      "evidence": "There is no exact SKU/name confidence threshold, so zero-score candidates can still appear."
+    },
+    {
+      "id": "M08",
+      "question": "Viết bài luận ngoài phạm vi mua sắm",
+      "result": "Fail",
+      "evidence": "There is no out-of-scope intent detector in the prototype."
+    }
+  ],
+  "linkChecks": {
+    "cardToProductDetail": "passed",
+    "routeToProductDetailPage": "passed",
+    "sourceBlock": "passed",
+    "liveCartRevalidation": "passed",
+    "emptyResultsHaveNoStaleLinks": "passed"
+  },
+  "summary": {
+    "manualCases": 8,
+    "correct": 2,
+    "partial": 4,
+    "failed": 2,
+    "linkChecksPassed": 5,
+    "hitAt5": "not measured",
+    "precisionAt5": "not measured",
+    "browserNavigation": "not run; requires a running API/catalog"
+  },
+  "limitations": [
+    "The current advisor is explicitly a deterministic keyword matcher, not the planned MongoDB Atlas Vector Search/RAG retrieval path.",
+    "Hit@5 and Precision@5 require a labeled query set and a live retrieval endpoint; the report's prototype does not expose those metrics yet.",
+    "A browser-level click test should be run after the server can connect to MongoDB Atlas."
+  ]
+}

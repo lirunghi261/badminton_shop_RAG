@@ -8,10 +8,10 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "types": ["node"],
     "resolveJsonModule": true,
     "noUncheckedIndexedAccess": true,
     "sourceMap": true
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts"]
 }
-
